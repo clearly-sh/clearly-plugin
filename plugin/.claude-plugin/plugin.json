@@ -1,0 +1,12 @@
+{
+  "name": "clearly",
+  "description": "Your company brain over MCP. Search org context (prompts, docs, decisions, facts), write decisions back so they compound, schedule your own follow-ups, and inherit the team's skills — plus boards, tickets, knowledge base, and the Omni agent. Includes a usage skill (clearly-workflows) and setup (clearly-init).",
+  "version": "0.2.0",
+  "author": {
+    "name": "Clearly",
+    "url": "https://clearly.sh"
+  },
+  "homepage": "https://clearly.sh",
+  "repository": "https://github.com/clearly-sh/clearly",
+  "keywords": ["clearly", "workspace", "mcp", "company-brain", "context", "memory", "agents", "skills", "kanban", "tickets"]
+}

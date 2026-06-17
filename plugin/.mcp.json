@@ -1,0 +1,13 @@
+{
+  "$schema": "https://github.com/anthropics/claude-code/blob/main/schemas/mcp.json",
+  "_comment": "Set CLEARLY_MCP_TOKEN in your shell (export CLEARLY_MCP_TOKEN=ck_mcp_...) before starting Claude Code. Mint a token at https://clearly.sh/settings → Developers → Create MCP token, or run /clearly:init to walk through it.",
+  "mcpServers": {
+    "clearly": {
+      "type": "http",
+      "url": "https://relay.clearly.sh/mcp",
+      "headers": {
+        "Authorization": "Bearer ${CLEARLY_MCP_TOKEN}"
+      }
+    }
+  }
+}

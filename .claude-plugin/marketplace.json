@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "clearly",
+  "description": "Clearly — your company brain over MCP, for Claude Code and any MCP agent.",
+  "owner": {
+    "name": "Clearly",
+    "url": "https://clearly.sh"
+  },
+  "plugins": [
+    {
+      "name": "clearly",
+      "description": "Connect your Clearly workspace as a company brain: search org context (prompts, docs, decisions, facts), write decisions back so they compound, schedule your own follow-ups, and inherit the team's skills. Bundles the pre-configured MCP server plus two skills — clearly-init (setup) and clearly-workflows (usage).",
+      "category": "productivity",
+      "source": "./plugin",
+      "homepage": "https://clearly.sh"
+    }
+  ]
+}
