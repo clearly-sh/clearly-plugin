@@ -1,41 +1,39 @@
 ---
 name: clearly-init
-description: Walk the user through getting their Clearly workspace connected to Claude Code — mint an MCP token, set the env var, verify the server shows up in /mcp.
+description: Walk the user through connecting their Clearly workspace to Claude Code over OAuth — sign in through the browser, verify the server shows up in /mcp.
 ---
+
+> **Tool names below are written UNPREFIXED** (`clearly_canvas_act`). Your runtime may
+> expose them with a server prefix — e.g.
+> `mcp__plugin_clearly_clearly-staging__clearly_canvas_act`. **Match by suffix, not by
+> exact name**: a skill written against the bare name resolves to nothing otherwise, and
+> the failure looks like "the tool doesn't exist" rather than "the name is decorated".
+>
+> **If no such tool is callable at all**, the Clearly MCP server isn't authorised in this
+> session — note that these skills still LIST when it isn't, so you find out by firing a
+> dead call. Authorise it (`/mcp`, or `claude mcp`), or if you have a shell, use the
+> `beehaven` CLI and its own `clearly-canvas` skill instead.
 
 # `/clearly:init` — connect a Clearly workspace to Claude Code
 
-Run this once per machine to get the Clearly MCP server reachable from Claude Code. The plugin's `.mcp.json` already points at `https://relay.clearly.sh/mcp`; this skill just handles the auth + verification.
+Run this once per machine to get the Clearly MCP server reachable from Claude Code. The plugin's `.mcp.json` already points at `https://relay.clearly.sh/mcp`; this skill just handles the OAuth sign-in + verification. Auth is **OAuth** — the user signs in through the browser, there's no token to mint, export, or paste.
 
 ## Steps
 
-### 1. Mint a token
+### 1. Authenticate (OAuth — browser sign-in)
 
-Tell the user to either:
+The plugin already wired the MCP server; the user just has to sign in. Tell them to either:
 
-- **Web (recommended)**: open https://clearly.sh/settings → **Developers** → **Create MCP token**. Pick **Read-only** (`rpc:read`) or **Read & write** (`rpc:read` + `rpc:write` — lets Claude write documents, schedule wakes, create boards/tickets). Copy the `ck_mcp_…` value (shown once). The same screen has the ready-to-paste Claude Code command + Cursor/Desktop JSON.
-- **CLI** (if they have the `beehaven` CLI from the Clearly Dev Mac app):
-  ```bash
-  beehaven call create-mcp-token '{"label":"Claude Code","scopes":["agent:ask","rpc:read","rpc:write"]}'
-  ```
+- **In Claude Code (recommended)**: run `/mcp`, select `clearly`, and choose **Authenticate**. A browser window opens for sign-in; approve and it closes itself. No token.
+- **From the shell**: `claude mcp login clearly` — same browser sign-in flow.
 
-### 2. Export the token in their shell
+The sign-in grants scoped access (`rpc:read` for search + read; add `rpc:write` to let Claude write documents, schedule wakes, create boards/tickets). Sign out / revoke anytime with `claude mcp logout clearly` (or Settings → **Developers** in the app).
 
-Have them paste this in `~/.zshrc` (or `~/.bashrc`) so it persists across sessions:
+> **Staging/dev:** point at the staging relay by setting `CLEARLY_MCP_URL=https://bee-relay-staging.throbbing-unit-1b3f.workers.dev/mcp` before launching Claude Code.
 
-```bash
-export CLEARLY_MCP_TOKEN="ck_mcp_..."
-```
+### 2. Verify
 
-Then `source ~/.zshrc` to pick it up in the current shell.
-
-### 3. Restart Claude Code
-
-The plugin's `.mcp.json` resolves `${CLEARLY_MCP_TOKEN}` at MCP server startup, so the env var has to be set before Claude Code launches.
-
-### 4. Verify
-
-Run `/mcp` in Claude Code. You should see `clearly` listed with ~48 tools. The ones that matter most:
+Run `/mcp` in Claude Code. You should see `clearly` listed (as **Authenticated**) with ~48 tools. The ones that matter most:
 
 - **Company brain** — `clearly_context_search` (one ranked search across prompts, docs, decisions + facts; `scope:"org"` federates across the org), `clearly_context_write` (write a doc/PRD/decision back in), `clearly_context_map` (orient).
 - **Self-prompting** — `clearly_schedule_wake` (write a prompt for your future self + schedule a wake, one-shot or recurring).
@@ -52,7 +50,7 @@ If Claude calls `clearly_context_map` and gets back brain stats + topics, the co
 
 ## Troubleshooting
 
-- **`Token missing scope "rpc:write"`** — mint a new token with `rpc:write` in the scope list.
-- **`Invalid token`** — token revoked or rotated. Re-mint and update the env var.
-- **MCP server doesn't show up in `/mcp`** — Claude Code needs to be restarted after setting the env var. Check `echo $CLEARLY_MCP_TOKEN` returns the token before launch.
+- **`Missing scope "rpc:write"`** — the sign-in didn't grant write access. Run `claude mcp logout clearly`, then re-authenticate (`/mcp` → **Authenticate**) and approve the write scope.
+- **`Not authenticated` / calls rejected** — the session expired or was revoked. Re-authenticate with `claude mcp login clearly` (or `/mcp` → **Authenticate**).
+- **`clearly` shows in `/mcp` but as unauthenticated** — the endpoint is preconfigured by the plugin; you still need to complete the browser sign-in. Select `clearly` → **Authenticate**.
 - **`Network error reaching ...`** — relay.clearly.sh might be down (rare); check https://clearly.sh status page.

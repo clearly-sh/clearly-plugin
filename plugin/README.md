@@ -4,42 +4,49 @@ Your **company brain** in Claude Code. Search org context (prompts, docs, decisi
 
 ## What's in the box
 
-- **Pre-configured MCP server** pointing at `https://relay.clearly.sh/mcp` — ~48 tools, including the Company Brain (`clearly_context_search` / `_write` / `_map`), self-prompting (`clearly_schedule_wake`), skills (`clearly_skill_list` / `_get`), and the full ~200-action catalog via `clearly_workspace_invoke`.
-- **Two skills:**
-  - **`clearly-init`** — setup: mint a token, set the env var, verify `/mcp`.
-  - **`clearly-workflows`** — usage: how to run the workspace as a company brain (search → write back → schedule).
+- **Pre-configured MCP server** pointing at `https://relay.clearly.sh/mcp` — ~48 tools, including the Company Brain (`clearly_context_search` / `_write` / `_map`), the **spatial canvas** (`clearly_canvas_perceive` / `_act` / `_catalog`), self-prompting (`clearly_schedule_wake`), skills (`clearly_skill_list` / `_get`), and the full ~200-action catalog via `clearly_workspace_invoke`.
+- **Skills:**
+  - **`clearly-init`** — setup: sign in over OAuth (browser), verify `/mcp`.
+  - **`clearly-workflows`** — company-brain usage: search → write back → schedule.
+  - **`clearly-canvas`** — the canvas operating manual: perceive → create frames / text / shapes / vector arrows / diffs that persist headlessly.
+  - **`pair-on-canvas`** — the board as mission control for a coding task: read the human's pinned spec, do the repo work, report plan / status / diff / PR as cards they steer by inking.
+  - **`ship-review`** — land a code change as a spatial change-map; the human inks notes, you read them back and revise.
+  - **`visualize`** — turn any concept or answer into a diagram (flowchart / sequence / ER / architecture / mind-map / matrix).
+  - **`codebase-map`** — walk a repo → a living architecture map (modules as frames, dependencies as arrows).
+  - **`sticker-pack`** — an idea → a printable die-cut sticker sheet on the canvas.
 
 ## Install
 
-The MCP **server is hosted** (`relay.clearly.sh/mcp`) — nothing to publish or run. You only need a token. There are two ways to connect:
+The MCP **server is hosted** (`relay.clearly.sh/mcp`) — nothing to publish or run. Auth is **OAuth**: you sign in through the browser, there's no token to mint or paste. There are two ways to connect:
 
 ### A. Manual — any MCP client, works today (no plugin, no repo)
 
-Mint a token at https://clearly.sh/settings → **Developers**, then either:
+Add the endpoint, then sign in through the browser:
 
 ```bash
-# Claude Code, one line:
-claude mcp add --transport http clearly https://relay.clearly.sh/mcp --header "Authorization: Bearer ck_mcp_..."
+# Claude Code, two lines:
+claude mcp add --transport http clearly https://relay.clearly.sh/mcp
+claude mcp login clearly     # opens the browser for OAuth sign-in
 ```
 
-…or paste the JSON into Cursor (`~/.cursor/mcp.json`) / Claude Desktop (`claude_desktop_config.json`):
+…or paste the JSON (no `headers` — OAuth-capable clients prompt a sign-in) into Cursor (`~/.cursor/mcp.json`) / Claude Desktop (`claude_desktop_config.json`):
 
 ```json
-{ "mcpServers": { "clearly": { "url": "https://relay.clearly.sh/mcp", "headers": { "Authorization": "Bearer ck_mcp_..." } } } }
+{ "mcpServers": { "clearly": { "url": "https://relay.clearly.sh/mcp" } } }
 ```
 
 This is the universal path. It does **not** include the skills.
 
 ### B. Claude Code plugin — bundles MCP + the skills
 
-The plugin adds `clearly-init` + `clearly-workflows` on top of the MCP server. It installs from a **public git marketplace repo** (Claude Code clones it — so the repo must be public; npm is not involved):
+The plugin adds all the skills above (`clearly-init`, `clearly-workflows`, `clearly-canvas`, `pair-on-canvas`, `ship-review`, `visualize`, `codebase-map`, `sticker-pack`) on top of the MCP server. It installs from a **public git marketplace repo** (Claude Code clones it — so the repo must be public; npm is not involved):
 
 ```
-export CLEARLY_MCP_TOKEN="ck_mcp_..."          # the plugin's .mcp.json reads this
 /plugin marketplace add clearly-sh/clearly-plugin
 /plugin install clearly@clearly
-/clearly:init
 ```
+
+Then run `/mcp`, select `clearly`, and choose **Authenticate** — a browser window opens for sign-in. No token.
 
 Devs with this monorepo checked out can skip the public repo and add the local path instead:
 
@@ -48,9 +55,9 @@ Devs with this monorepo checked out can skip the public repo and add the local p
 /plugin install clearly@clearly
 ```
 
-> **Publishing note:** external users need a public repo to `marketplace add`. Publish the contents of this folder (`apps/mcp-server/plugin/` — plus a root `.claude-plugin/marketplace.json`) to `clearly-sh/clearly-plugin`. The remote MCP needs nothing published; the optional stdio binary `@clearly/mcp-server` is `private` and only needed for offline/local use.
+> **Publishing note:** external users need a public repo to `marketplace add`. Publish the contents of this folder (`apps/mcp-server/plugin/` — plus a root `.claude-plugin/marketplace.json`) to `clearly-sh/clearly-plugin`. The remote MCP needs nothing published.
 
-Then run `/clearly:init` and follow the prompts. The `clearly-workflows` skill loads automatically when you work a connected workspace.
+Run `/clearly:init` to walk through the browser sign-in and verify the connection. The `clearly-workflows` skill loads automatically when you work a connected workspace.
 
 ## What you can do once connected
 
@@ -63,13 +70,21 @@ Ask Claude Code things like:
 - "What skills does this workspace have for shipping a PRD?" → `clearly_skill_list` → `clearly_skill_get`
 - "Create a kanban board / add a ticket / take over the storefront chat." → typed tools + `clearly_workspace_invoke`
 
+…and drive the **spatial canvas**:
+
+- "Work the task on my canvas." / "Take this spec from the board." / "Let's pair on the canvas." → `pair-on-canvas`
+- "Put this PR on the canvas so I can review it." → `ship-review` → `clearly_canvas_act { action: 'canvas.add-diff' }`
+- "Diagram how our auth flow works." / "Draw this, don't write it." → `visualize`
+- "Map this codebase's architecture." → `codebase-map`
+- "Make me a sticker pack about shipping code." → `sticker-pack`
+
 Claude picks the right tool from the MCP catalog and dispatches.
 
 ## Auth + scopes
 
-Tokens (`ck_mcp_…`) are scoped — `agent:ask`, `rpc:read`, `rpc:write`, `admin`. Mint a least-privilege token (read-only for shared access; read+write for your personal Claude Code).
+Auth is **OAuth** — you sign in through the browser on first connect; there's no token to mint, export, or paste. The sign-in grants scoped access — `agent:ask`, `rpc:read`, `rpc:write`, `admin` — least-privilege by default (read-only for shared access; read+write for your personal Claude Code).
 
-Mint here: https://clearly.sh/settings → **Developers** → **Create MCP token** (it gives you the ready-to-paste config too). Tokens are shown once, revocable, and rate-limited (120/min).
+Sign out / revoke anytime with `claude mcp logout clearly` (or Settings → **Developers** in the app). Connections are rate-limited (120/min).
 
 ## What this plugin doesn't ship
 
@@ -79,4 +94,4 @@ Mint here: https://clearly.sh/settings → **Developers** → **Create MCP token
 
 ## Source
 
-Source for the `relay.clearly.sh/mcp` endpoint: `apps/cloudflare/src/hive.ts`. Source for the local stdio fallback binary: `apps/mcp-server/src/index.ts`. Both in the `clearly-sh/clearly` repo.
+Source for the `relay.clearly.sh/mcp` endpoint (worker + OAuth): `apps/cloudflare/src/hive.ts`, in the `clearly-sh/clearly` repo.

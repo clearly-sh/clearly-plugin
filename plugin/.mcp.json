@@ -1,13 +1,14 @@
 {
   "$schema": "https://github.com/anthropics/claude-code/blob/main/schemas/mcp.json",
-  "_comment": "Set CLEARLY_MCP_TOKEN in your shell (export CLEARLY_MCP_TOKEN=ck_mcp_...) before starting Claude Code. Mint a token at https://clearly.sh/settings → Developers → Create MCP token, or run /clearly:init to walk through it.",
+  "_comment": "Bundled Clearly MCP connectors: `clearly` = production (relay.clearly.sh), `clearly-staging` = staging worker. Install the plugin → both servers + the skills, one step. OAuth, no token: /mcp -> pick a server -> Authenticate. (Claude Code namespaces plugin-bundled servers, so /mcp lists them as `plugin:clearly:clearly` / `plugin:clearly:clearly-staging` — the server names are `clearly` / `clearly-staging`.)",
   "mcpServers": {
     "clearly": {
       "type": "http",
-      "url": "https://relay.clearly.sh/mcp",
-      "headers": {
-        "Authorization": "Bearer ${CLEARLY_MCP_TOKEN}"
-      }
+      "url": "https://relay.clearly.sh/mcp"
+    },
+    "clearly-staging": {
+      "type": "http",
+      "url": "https://bee-relay-staging.throbbing-unit-1b3f.workers.dev/mcp"
     }
   }
 }
