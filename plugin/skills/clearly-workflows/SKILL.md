@@ -3,6 +3,17 @@ name: clearly-workflows
 description: How to actually USE a connected Clearly workspace as a company brain — retrieve org context, write decisions back so they compound, schedule your own follow-ups, and inherit the team's skills. Use whenever you're working in a repo/task that has the `clearly` MCP server connected and you need company context or want your work to persist for the next agent.
 ---
 
+> **Tool names below are written UNPREFIXED** (`clearly_canvas_act`). Your runtime may
+> expose them with a server prefix — e.g.
+> `mcp__plugin_clearly_clearly-staging__clearly_canvas_act`. **Match by suffix, not by
+> exact name**: a skill written against the bare name resolves to nothing otherwise, and
+> the failure looks like "the tool doesn't exist" rather than "the name is decorated".
+>
+> **If no such tool is callable at all**, the Clearly MCP server isn't authorised in this
+> session — note that these skills still LIST when it isn't, so you find out by firing a
+> dead call. Authorise it (`/mcp`, or `claude mcp`), or if you have a shell, use the
+> `beehaven` CLI and its own `clearly-canvas` skill instead.
+
 # Working a Clearly workspace (Company Brain)
 
 Clearly is a **company brain over MCP**: every prompt + agent response is auto-cataloged into a searchable, ranked archive, with documents, decisions, and durable facts alongside. Treat it the way you'd treat a repo — read before you write, and write so the next agent inherits your work.
