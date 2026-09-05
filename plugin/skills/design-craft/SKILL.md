@@ -4,8 +4,8 @@ description: >-
   The craft layer for visual work on a Clearly canvas — how to make something
   that looks like a design studio made it, not like a first draft. Grid
   construction, type scale, colour systems, spacing, hierarchy, optical
-  correction, and the pass to run before calling anything finished. Load this
-  BEFORE building any poster, deck, identity, landing page, social post, cover,
+  correction, and the pass to run before calling anything finished. Use whenever visual
+  quality is the point rather than an afterthought, and load it BEFORE building any poster, deck, identity, landing page, social post, cover,
   report or diagram; clearly-canvas tells you HOW to place a node, this tells
   you WHERE it goes and WHY. Triggers: "design", "make it look good", "make it
   beautiful", "lay this out", "poster", "deck", "landing page", "brand", "this

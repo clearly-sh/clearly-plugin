@@ -1,6 +1,15 @@
 ---
 name: clearly-workflows
-description: How to actually USE a connected Clearly workspace as a company brain — retrieve org context, write decisions back so they compound, schedule your own follow-ups, and inherit the team's skills. Use whenever you're working in a repo/task that has the `clearly` MCP server connected and you need company context or want your work to persist for the next agent.
+description: >-
+  Use the Clearly workspace as a COMPANY BRAIN — search the org's accumulated
+  context (decisions, facts, prompts, docs), write conclusions back so the next
+  agent inherits them instead of re-deriving them, and inherit the team's
+  skills. Use when a question is about what this company already decided or
+  knows, and after you work something out that the next person would otherwise
+  rediscover. Triggers: "what did we decide", "why did we do it this way", "has
+  anyone looked at this", "remember this", "write that down", "what do we know
+  about X", "company context", "our decisions", "prior art", "institutional
+  knowledge", "so nobody has to work this out again".
 ---
 
 > **Tool names below are written UNPREFIXED** (`clearly_canvas_act`). Your runtime may
@@ -53,24 +62,7 @@ clearly_context_write {
 
 It creates the document AND files a searchable catalog entry, so the very next `clearly_context_search` finds it. Mark anything sensitive `private: true`.
 
-## 4. Schedule your future self
-
-`clearly_schedule_wake` lets you write a prompt for a later invocation and fire it on a schedule:
-
-```jsonc
-// one-shot
-clearly_schedule_wake { "prompt": "Check the launch metrics and summarize", "runAt": 1751000000000 }
-// recurring
-clearly_schedule_wake { "prompt": "Triage new tickets", "cronExpr": "0 9 * * 1" }
-```
-
-Best pattern — keep the prompt in the brain so edits take effect:
-1. `clearly_context_write` the follow-up task (get back its id).
-2. `clearly_schedule_wake { "promptRef": { "source": "document", "id": "<id>" }, "runAt": … }` — resolved fresh at fire time.
-
-The wake re-invokes the agent with that prompt; its output is cataloged, so the loop compounds.
-
-## 5. Inherit the team's skills
+## 4. Inherit the team's skills
 
 The workspace has its own skills (procedures the team grew). Before improvising a multi-step task, check whether one exists:
 
@@ -87,5 +79,9 @@ Follow the loaded procedure rather than inventing your own — that's how you wo
 
 - **Read → act → write back.** Search first; file durable outcomes so they persist.
 - **`scope:"org"`** for cross-team questions; **`private:true`** for sensitive writes.
-- **`promptRef` over inline** for scheduled prompts, so the latest version fires.
+
+<!-- A "Schedule your future self" section documenting `clearly_schedule_wake` was removed on
+     2026-08-02: the tool is in ZERO entries of mcp-server.ts's tool list and `schedule-wake` is
+     not a registered RPC, so every example here failed. Restore only when it is in tools/list. -->
+
 - **Check `clearly_skill_list`** before hand-rolling a known procedure.

@@ -16,7 +16,7 @@ description: Walk a code repository and draw a living ARCHITECTURE MAP of it on 
 
 # Codebase map — repo → spatial architecture diagram
 
-A `tree` dump is 400 files of noise. The thing a dev actually wants is the **shape**: ~8 boxes, sized by weight, wired by who-imports-whom, with the hot, gnarly module obvious. You have host tools (Bash, Read, Grep, Glob) to *inspect* the repo and the Clearly canvas tools to *draw* it. Read `clearly-canvas` for the primitives + the locked tool contract — this skill builds on it (perceive → act → revise; `frame.create`; `canvas.create-node` text/rect/svg; nesting via `parentId`; arrows = `type:"svg"` marker-end; always `compositionId`). Don't re-derive that here.
+A `tree` dump is 400 files of noise. The thing a dev actually wants is the **shape**: ~8 boxes, sized by weight, wired by who-imports-whom, with the hot, gnarly module obvious. You have host tools (Bash, Read, Grep, Glob) to *inspect* the repo and the Clearly canvas tools to *draw* it. Read `clearly-canvas` for the primitives + the locked tool contract — this skill builds on it (perceive → act → revise; `frame.create`; `canvas.create-node` text/rect/svg; nesting via `parentId`; arrows = `arrow.create {from,to}` (a first-class arrow that binds to the boxes + follows them; `routing:"elbow"` + `label` for wiring diagrams); always `compositionId`). Don't re-derive that here.
 
 ## 1. Discover the structure (host shell)
 
@@ -101,9 +101,7 @@ clearly_canvas_act {
     { "action": "canvas.create-node", "args": { "type": "rect", "name": "ui-key-canvas",
       "text": "DocumentCanvas.tsx", "x": 16, "y": 64, "w": 180, "h": 30, "fill": "#1e2d4d", "stroke": "#3b82f6", "radius": 6, "parentId": "<uiFrameId>" } },
 
-    { "action": "canvas.create-node", "args": {
-      "type": "svg", "name": "ui→lib", "x": 360, "y": 90, "w": 80, "h": 24,
-      "svg": "<svg viewBox='0 0 80 24'><defs><marker id='a' markerWidth='10' markerHeight='10' refX='8' refY='3' orient='auto'><path d='M0,0 L8,3 L0,6 Z' fill='#7c8497'/></marker></defs><line x1='2' y1='12' x2='72' y2='12' stroke='#7c8497' stroke-width='3' marker-end='url(#a)'/></svg>" } }
+    { "action": "arrow.create", "args": { "from":"ui", "to":"lib", "routing":"elbow" } }
   ]
 }
 ```
@@ -125,7 +123,7 @@ Good map answers three questions instantly: *what are the big pieces, how do the
 
 ## 5. Keep it live
 
-This isn't a one-shot render — it's a living diagram. After the repo changes, re-run §1 and `canvas.update-nodes` the frames whose LOC/coupling shifted (resize, recolor, re-arrow) instead of redrawing — the map stays current as the codebase moves. Pairs naturally with **`ship-review`** (the per-change diff map lands *next to* the architecture map) and **`beehaven watch git`** (re-tune the map as commits land).
+This isn't a one-shot render — it's a living diagram. After the repo changes, re-run §1 and `canvas.update-nodes` the frames whose LOC/coupling shifted (resize, recolor, re-arrow) instead of redrawing — the map stays current as the codebase moves. Pairs naturally with **`ship-review`** (the per-change diff map lands *next to* the architecture map) and **`beehaven watch git`** (re-tune the map as commits land — ⚠ CLI-only; on MCP, re-run §1 when you know the repo moved).
 
 ## The viral bit
 

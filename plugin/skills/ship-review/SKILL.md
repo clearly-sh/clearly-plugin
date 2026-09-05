@@ -24,7 +24,7 @@ Prereq: the `clearly` MCP is connected (run `clearly-init` if not). Read `clearl
 
 - You just finished a multi-file change and are about to open a PR.
 - The user says *review this / what changed / look at the diff / put this on the canvas*.
-- A `beehaven watch git` run is pushing commits and you're narrating the review.
+- A `beehaven watch git` run is pushing commits and you're narrating the review. ⚠ CLI-only — on MCP there is no shell, so drive the review from the diff you already have.
 
 Skip it for a one-line, single-file change — a normal diff is fine. The canvas wins for the **shape of a change**: multiple files, a refactor, anything where relationships matter.
 
@@ -65,7 +65,7 @@ clearly_canvas_act {
 
 ## 3. Make it a MAP, not a list
 
-This is where you earn the canvas. After the cards land, `clearly_canvas_perceive` to get their bounds, then add structure with `clearly_canvas_act` (see `clearly-canvas` for arrow SVGs):
+This is where you earn the canvas. After the cards land, `clearly_canvas_perceive` to get their bounds, then add structure with `clearly_canvas_act` — wire dependencies with `arrow.create {from, to}` (a first-class arrow that binds to the cards + follows them; see `clearly-canvas` → Arrows / connectors):
 
 - **Dependency arrows** — when file A now imports/calls something new in file B, draw a vector arrow A→B. The reviewer instantly sees the blast radius.
 - **Cluster by concern** — `canvas.update-nodes` to move cards into groups (API / UI / tests / migration). Drop a `text` heading over each cluster.
@@ -94,4 +94,4 @@ A screenshot of a real PR as a spatial map — file cards, dependency arrows, a 
 - **Title it with the commit subject**; flag the riskiest file explicitly.
 - **Arrows only where a real dependency changed** — don't decorate, inform.
 - **Always re-perceive** to read the human's annotations; map each to a file by bounds; revise.
-- **Pair with `beehaven watch git`** to stream each commit's diff onto the board as you work.
+- **Pair with `beehaven watch git`** to stream each commit's diff onto the board as you work. ⚠ CLI-only; on MCP, land each diff with `canvas.add-diff` as you finish it.
