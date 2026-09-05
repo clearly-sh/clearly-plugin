@@ -1,12 +1,12 @@
 {
   "name": "clearly",
   "description": "Your company brain + spatial canvas over MCP. Search org context (prompts, docs, decisions, facts) and write decisions back so they compound — AND drive an infinite Skia canvas: land code diffs, diagrams, codebase maps, and sticker sheets as real vector nodes your agent creates and the human annotates back. Use the canvas as mission control for a coding task (pair-on-canvas): the human pins a spec, you do the repo work and report diffs + status as cards they steer by inking. Bundles canvas skills (clearly-canvas, pair-on-canvas, ship-review, visualize, codebase-map, sticker-pack), company-brain usage (clearly-workflows), and setup (clearly-init).",
-  "version": "0.4.0",
+  "version": "0.7.0",
   "author": {
     "name": "Clearly",
     "url": "https://clearly.sh"
   },
   "homepage": "https://clearly.sh",
-  "repository": "https://github.com/clearly-sh/clearly",
+  "repository": "https://github.com/clearly-sh/clearly-plugin",
   "keywords": ["clearly", "workspace", "mcp", "company-brain", "context", "memory", "agents", "skills", "canvas", "spatial-canvas", "diagram", "diff-review", "whiteboard", "stickers", "kanban", "tickets", "coding-agent", "mission-control", "agent-canvas", "pair-programming"]
 }
