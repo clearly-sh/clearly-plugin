@@ -1,6 +1,7 @@
 ---
 name: visualize
-description: Turn any concept, answer, or described system into a clean DIAGRAM on a Clearly spatial canvas instead of a wall of text. Load this when the user asks to "diagram / draw / sketch / map / visualize / explain visually / show me how X works / flowchart this / make a diagram" — AND proactively whenever YOUR OWN answer would be clearer as a picture than a paragraph (a flow with branches, who-calls-whom, a schema, an architecture, options on axes). Picks the right diagram type for the content and builds it with the canvas primitives.
+description: Turn any concept, answer, or described system into a clean DIAGRAM on a Clearly spatial canvas instead of a wall of text. Load this when the user asks to "diagram this", "draw it", "sketch it", "map it out", "visualize this",
+  "explain visually", "show me how X works", "flowchart this", "make a diagram" — AND proactively whenever YOUR OWN answer would be clearer as a picture than a paragraph (a flow with branches, who-calls-whom, a schema, an architecture, options on axes). Picks the right diagram type for the content and builds it with the canvas primitives.
 ---
 
 > **Tool names below are written UNPREFIXED** (`clearly_canvas_act`). Your runtime may
@@ -40,7 +41,7 @@ When unsure, ask: *is the story "then" (flowchart), "who" (sequence), "what's-re
 
 1. **Get a canvas + perceive.** `clearly_canvas_perceive { compositionId, format:"text" }` → read `backgroundColor` (design WITH it — light ink on dark, dark ink on light) and `gaze.visibleWorldRect` (place work where the user is looking).
 2. **Batch the skeleton.** One `clearly_canvas_act` with a `batch` of frames + boxes on a grid. Capture every returned `{ id }`.
-3. **Wire the arrows** using the boxes' bounds (arrows are `type:"svg"` with a `marker-end` — see clearly-canvas §5).
+3. **Wire the arrows** with `arrow.create {from, to}` — a first-class arrow that BINDS to the boxes (by returned id OR layer name) and FOLLOWS them when they move; `routing:"elbow"` for orthogonal flowcharts, `label` for the edge text (no separate label node needed). See clearly-canvas → Arrows / connectors.
 4. **Label** edges/branches with small `text` nodes at arrow midpoints.
 5. **Re-perceive** so the user can ink notes; read them back; revise with `canvas.update-nodes`.
 
@@ -59,8 +60,7 @@ clearly_canvas_act { "compositionId": "c_…", "batch": [
   { "action": "canvas.create-node", "args": { "type":"text", "name":"b1t", "text":"Member acts", "x":16, "y":26, "size":15, "fontWeight":600, "fill":"#e8edf5" } },
   { "action": "canvas.create-node", "args": { "type":"rect", "name":"b2", "x":260, "y":0, "w":180, "h":72, "fill":"#1b2230", "stroke":"#3a465c", "radius":10 } },
   { "action": "canvas.create-node", "args": { "type":"text", "name":"b2t", "text":"Debit seat budget", "x":276, "y":26, "size":15, "fontWeight":600, "fill":"#e8edf5" } },
-  { "action": "canvas.create-node", "args": { "type":"svg", "name":"b1→b2", "x":180, "y":24, "w":80, "h":24,
-    "svg":"<svg viewBox='0 0 80 24'><defs><marker id='a' markerWidth='10' markerHeight='10' refX='8' refY='3' orient='auto'><path d='M0,0 L8,3 L0,6 Z' fill='#7c8497'/></marker></defs><line x1='2' y1='12' x2='72' y2='12' stroke='#7c8497' stroke-width='2' marker-end='url(#a)'/></svg>" } }
+  { "action": "arrow.create", "args": { "from":"b1", "to":"b2", "routing":"elbow" } }
 ]}
 ```
 
@@ -74,11 +74,7 @@ Chain more boxes at `x += 260` per step. Branch (e.g. "budget exhausted → top-
 clearly_canvas_act { "compositionId":"c_…", "batch":[
   { "action":"canvas.create-node", "args":{ "type":"rect", "name":"start", "x":120, "y":0, "w":160, "h":56, "fill":"#173a2a", "stroke":"#2f6b4d", "radius":28 } },
   { "action":"canvas.create-node", "args":{ "type":"text", "name":"startt", "text":"Invite sent", "x":156, "y":18, "size":14, "fontWeight":600, "fill":"#d6f5e4" } },
-  { "action":"canvas.create-node", "args":{ "type":"svg", "name":"decide", "x":120, "y":110, "w":160, "h":100,
-    "svg":"<svg viewBox='0 0 160 100'><polygon points='80,4 156,50 80,96 4,50' fill='#2a2410' stroke='#6b5a2f' stroke-width='2'/></svg>" } },
-  { "action":"canvas.create-node", "args":{ "type":"text", "name":"decidet", "text":"Seat free?", "x":138, "y":50, "size":13, "fontWeight":600, "fill":"#f5ead6" } },
-  { "action":"canvas.create-node", "args":{ "type":"svg", "name":"yes", "x":188, "y":56, "w":24, "h":54,
-    "svg":"<svg viewBox='0 0 24 54'><defs><marker id='y' markerWidth='9' markerHeight='9' refX='7' refY='3' orient='auto'><path d='M0,0 L7,3 L0,6 Z' fill='#7c8497'/></marker></defs><line x1='12' y1='2' x2='12' y2='48' stroke='#7c8497' stroke-width='2' marker-end='url(#y)'/></svg>" } },
+  { "action": "arrow.create", "args": { "from":"start", "to":"decide", "label":"yes", "routing":"elbow" } },
   { "action":"canvas.create-node", "args":{ "type":"text", "name":"yesl", "text":"yes", "x":216, "y":74, "size":12, "fontWeight":600, "fill":"#7c8497" } }
 ]}
 ```
@@ -97,8 +93,7 @@ clearly_canvas_act { "compositionId":"c_…", "batch":[
   { "action":"canvas.create-node", "args":{ "type":"rect", "name":"a2", "x":280, "y":0, "w":120, "h":40, "fill":"#1b2230", "stroke":"#3a465c", "radius":8 } },
   { "action":"canvas.create-node", "args":{ "type":"text", "name":"a2t", "text":"Home DO", "x":312, "y":12, "size":14, "fontWeight":600, "fill":"#e8edf5" } },
   { "action":"canvas.create-node", "args":{ "type":"line", "name":"a2life", "x":340, "y":40, "w":0, "h":300, "stroke":"#3a465c" } },
-  { "action":"canvas.create-node", "args":{ "type":"svg", "name":"m1", "x":60, "y":70, "w":280, "h":20,
-    "svg":"<svg viewBox='0 0 280 20'><defs><marker id='s' markerWidth='9' markerHeight='9' refX='7' refY='3' orient='auto'><path d='M0,0 L7,3 L0,6 Z' fill='#7c8497'/></marker></defs><line x1='2' y1='10' x2='272' y2='10' stroke='#7c8497' stroke-width='2' marker-end='url(#s)'/></svg>" } },
+  { "action": "arrow.create", "args": { "from":"a1life", "to":"a2life", "label":"check-quota(userId)" } },
   { "action":"canvas.create-node", "args":{ "type":"text", "name":"m1t", "text":"check-quota(userId)", "x":120, "y":52, "size":12, "fontWeight":500, "fill":"#aab3c2" } }
 ]}
 ```
@@ -113,11 +108,7 @@ Place the message text just above its arrow. A return/response arrow points back
 clearly_canvas_act { "compositionId":"c_…", "batch":[
   { "action":"frame.create", "args":{ "name":"Worker", "x":0, "y":80, "w":200, "h":110, "fill":"#141a24" } },
   { "action":"canvas.create-node", "args":{ "type":"text", "name":"wl", "text":"CF Worker", "x":14, "y":12, "size":14, "fontWeight":700, "fill":"#e8edf5", "parentId":"<WorkerFrameId>" } },
-  { "action":"canvas.create-node", "args":{ "type":"svg", "name":"do-store", "x":320, "y":80, "w":140, "h":110,
-    "svg":"<svg viewBox='0 0 140 110'><ellipse cx='70' cy='16' rx='60' ry='14' fill='#1d2a22' stroke='#2f6b4d'/><path d='M10,16 V94 a60,14 0 0 0 120,0 V16' fill='#1d2a22' stroke='#2f6b4d'/><ellipse cx='70' cy='16' rx='60' ry='14' fill='none' stroke='#2f6b4d'/></svg>" } },
-  { "action":"canvas.create-node", "args":{ "type":"text", "name":"do-l", "text":"DO + SQLite", "x":350, "y":126, "size":13, "fontWeight":600, "fill":"#d6f5e4" } },
-  { "action":"canvas.create-node", "args":{ "type":"svg", "name":"w→do", "x":200, "y":120, "w":120, "h":24,
-    "svg":"<svg viewBox='0 0 120 24'><defs><marker id='c' markerWidth='10' markerHeight='10' refX='8' refY='3' orient='auto'><path d='M0,0 L8,3 L0,6 Z' fill='#7c8497'/></marker></defs><line x1='2' y1='12' x2='112' y2='12' stroke='#7c8497' stroke-width='2' marker-end='url(#c)'/></svg>" } }
+  { "action": "arrow.create", "args": { "from":"Worker", "to":"HomeDO", "routing":"elbow", "label":"rpc" } }
 ]}
 ```
 
@@ -190,7 +181,7 @@ A clean diagram is **instantly screenshot-shareable** in a way a paragraph never
 - **Prose smell test:** about to write 3+ paragraphs about how things connect? Draw it instead.
 - **Pick by the question:** "then" → flowchart, "who/when" → sequence, "what's related" → ER, "which is better" → matrix, "one idea outward" → mind-map.
 - **Skeleton in one `batch`**, then arrows, then labels — capture every returned `id`.
-- **Arrows = `type:"svg"` with a `marker-end`** (curves = `<path>`); always pass `compositionId`; `name` on every create.
+- **Arrows = `arrow.create {from,to}`** — a first-class arrow that BINDS to the boxes and follows them (`routing:"elbow"` for flowcharts, `label` for edge text). Never hand-draw one as `type:"svg"` with a `marker-end`: that is a static path that does not move with its nodes; always pass `compositionId`; `name` on every create.
 - **Grid or it's a dump:** equal gutters, aligned edges, one read direction, generous whitespace.
 - **Perceive first** (design with `backgroundColor`, place in `gaze`); **re-perceive after** to read the human's ink and revise.
 - **Need an action not in clearly-canvas?** `clearly_canvas_catalog { surface:"all" }` — don't invent action names.

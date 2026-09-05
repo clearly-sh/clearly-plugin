@@ -244,7 +244,7 @@ once the board already exists.
 
 ```bash
 # connect two nodes (ids OR layer names) — the end gets an arrowhead
-beehaven call canvas-act '{"action":"arrow.create","args":{"from":"boxA","to":"boxB"}}'
+beehaven call canvas-act '{"action":"arrow.create","args":{"from":"card","to":"panel"}}'
 # a labelled dependency, elbow-routed
 beehaven call canvas-act '{"action":"arrow.create","args":{"from":"api","to":"db","routing":"elbow","label":"reads","endHead":"triangle"}}'
 # a free annotation arrow (no binding), coloured
