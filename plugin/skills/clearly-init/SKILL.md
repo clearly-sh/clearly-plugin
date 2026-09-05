@@ -1,6 +1,13 @@
 ---
 name: clearly-init
-description: Walk the user through connecting their Clearly workspace to Claude Code over OAuth — sign in through the browser, verify the server shows up in /mcp.
+description: >-
+  Connect a Clearly workspace to this client over OAuth and prove it worked —
+  sign in through the browser, confirm the server is listed, and check the
+  connection actually answers. Use FIRST whenever a Clearly tool is refused for
+  auth, returns nothing on a workspace that should have content, or the user has
+  never connected. Triggers: "connect Clearly", "set up Clearly", "sign in to
+  Clearly", "authenticate", "it says unauthorized", "no workspace", "the tools
+  are not showing up", "/mcp shows nothing", "which workspace am I in".
 ---
 
 > **Tool names below are written UNPREFIXED** (`clearly_canvas_act`). Your runtime may
@@ -36,7 +43,6 @@ The sign-in grants scoped access (`rpc:read` for search + read; add `rpc:write` 
 Run `/mcp` in Claude Code. You should see `clearly` listed (as **Authenticated**) with ~48 tools. The ones that matter most:
 
 - **Company brain** — `clearly_context_search` (one ranked search across prompts, docs, decisions + facts; `scope:"org"` federates across the org), `clearly_context_write` (write a doc/PRD/decision back in), `clearly_context_map` (orient).
-- **Self-prompting** — `clearly_schedule_wake` (write a prompt for your future self + schedule a wake, one-shot or recurring).
 - **Skills** — `clearly_skill_list` / `clearly_skill_get` (discover + load this workspace's procedures).
 - **Catch-all** — `clearly_workspace_catalog` (list all ~200 actions), `clearly_workspace_invoke` (run any by name), `clearly_workspace_ask` (talk to the Omni agent).
 - **Discovery** (no auth) — search public projects, ask a public agent, capture a lead.
