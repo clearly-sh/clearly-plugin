@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "clearly",
-      "description": "Connect your Clearly workspace as a company brain + spatial canvas: search org context (prompts, docs, decisions, facts), write decisions back so they compound, and drive an infinite Skia canvas — land diffs, diagrams, and codebase maps as real vector nodes the human annotates back. Use the canvas as mission control for a coding task (pair-on-canvas): pin a spec, do the repo work, report diffs + status as cards. Bundles the pre-configured MCP server plus skills: clearly-init, clearly-workflows, clearly-canvas, pair-on-canvas, ship-review, visualize, codebase-map, sticker-pack.",
+      "description": "Connect your Clearly workspace as a company brain + spatial canvas: search org context (prompts, docs, decisions, facts), write decisions back so they compound, and drive an infinite Skia canvas — land diffs, diagrams, and codebase maps as real vector nodes the human annotates back. Use the canvas as mission control for a coding task (pair-on-canvas): pin a spec, do the repo work, report diffs + status as cards. Bundles the pre-configured MCP server plus DESIGN skills that give the agent studio-grade craft — design-craft (grid construction, modular type scale, colour systems, optical correction, a verify-before-done pass), brand-identity (brief → constructed mark → lockups → palette → applications → spec board) and layout-systems (poster, deck, landing page, editorial, social — with the real numbers per format) — alongside clearly-init, clearly-workflows, clearly-canvas, pair-on-canvas, ship-review, visualize, codebase-map, sticker-pack.",
       "category": "productivity",
       "source": "./plugin",
       "homepage": "https://clearly.sh"
