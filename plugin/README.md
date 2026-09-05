@@ -4,10 +4,18 @@ Your **company brain** in Claude Code. Search org context (prompts, docs, decisi
 
 ## What's in the box
 
-- **Pre-configured MCP server** pointing at `https://relay.clearly.sh/mcp` — ~48 tools, including the Company Brain (`clearly_context_search` / `_write` / `_map`), the **spatial canvas** (`clearly_canvas_perceive` / `_act` / `_catalog`), self-prompting (`clearly_schedule_wake`), skills (`clearly_skill_list` / `_get`), and the full ~200-action catalog via `clearly_workspace_invoke`.
+- **Pre-configured MCP server** pointing at `https://relay.clearly.sh/mcp` — ~48 tools, including the Company Brain (`clearly_context_search` / `_write` / `_map`), the **spatial canvas** (`clearly_canvas_perceive` / `_act` / `_catalog`), skills (`clearly_skill_list` / `_get`), and the full ~200-action catalog via `clearly_workspace_invoke`.
 - **Skills:**
   - **`clearly-init`** — setup: sign in over OAuth (browser), verify `/mcp`.
   - **`clearly-workflows`** — company-brain usage: search → write back → schedule.
+  - **`design-craft`** — the craft layer: grid construction, modular type scale, colour
+    systems, spacing, hierarchy, optical correction, and the studio pass to run before
+    calling anything done. Load it before any visual work.
+  - **`brand-identity`** — a full identity the way a studio ships one: brief, constructed
+    mark, lockups + clear space, palette with roles, type system, real applications, and a
+    spec board someone else can build from.
+  - **`layout-systems`** — the named artefacts with their real numbers: poster, social
+    campaign, deck, landing page, editorial spread, cards — and how each one usually fails.
   - **`clearly-canvas`** — the canvas operating manual: perceive → create frames / text / shapes / vector arrows / diffs that persist headlessly.
   - **`pair-on-canvas`** — the board as mission control for a coding task: read the human's pinned spec, do the repo work, report plan / status / diff / PR as cards they steer by inking.
   - **`ship-review`** — land a code change as a spatial change-map; the human inks notes, you read them back and revise.
@@ -66,7 +74,6 @@ Ask Claude Code things like:
 - "What do we know about per-seat billing?" → `clearly_context_search`
 - "Search the whole org for prior decisions on pricing." → `clearly_context_search { scope: 'org' }`
 - "Write this decision into the brain so the team has it." → `clearly_context_write`
-- "Remind me to review the launch metrics next Monday 9am." → `clearly_schedule_wake`
 - "What skills does this workspace have for shipping a PRD?" → `clearly_skill_list` → `clearly_skill_get`
 - "Create a kanban board / add a ticket / take over the storefront chat." → typed tools + `clearly_workspace_invoke`
 
