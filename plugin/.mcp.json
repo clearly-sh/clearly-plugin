@@ -1,12 +1,9 @@
 {
   "$schema": "https://github.com/anthropics/claude-code/blob/main/schemas/mcp.json",
-  "_comment": "Bundled Clearly MCP connectors: `clearly` = production (relay.clearly.sh), `clearly-staging` = staging worker. Install the plugin → both servers + the skills, one step. OAuth, no token: /mcp -> pick a server -> Authenticate. (Claude Code namespaces plugin-bundled servers, so /mcp lists them as `plugin:clearly:clearly` / `plugin:clearly:clearly-staging` — the server names are `clearly` / `clearly-staging`.)",
+  "_comment": "The bundled Clearly MCP connector. Install the plugin → the server + the skills, one step. OAuth, no token: /mcp -> clearly -> Authenticate. (Claude Code namespaces plugin-bundled servers, so /mcp lists it as `plugin:clearly:clearly` — the server name is `clearly`.)",
+  "_staging": "⚠ THE STAGING SERVER IS DELIBERATELY NOT BUNDLED (2026-09-10). It was, and this plugin is published to a PUBLIC directory — so every installer received a second connector pointing at our staging worker: an internal hostname disclosed to strangers, and a server nobody outside the team should ever authenticate against. Two servers also make `/mcp` ambiguous for someone whose only question is 'connect my workspace'. To test against staging, add it to your own .mcp.json locally; do not put it back here.",
   "mcpServers": {
     "clearly": {
-      "type": "http",
-      "url": "https://relay.clearly.sh/mcp"
-    },
-    "clearly-staging": {
       "type": "http",
       "url": "https://relay.clearly.sh/mcp"
     }
