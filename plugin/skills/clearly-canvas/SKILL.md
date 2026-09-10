@@ -838,6 +838,6 @@ You're running in a terminal on the user's Mac. Don't leak processes:
 ## Reference
 
 - Worker RPC catalog: `beehaven call canvas:actions '{"format":"markdown","compact":true}'`
-- Full canvas-comm protocol: `https://www.clearly.sh/docs/canvas-comm-protocol`
+- Full canvas API reference: `https://www.clearly.sh/docs/canvas-api`
 - Beehaven CLI verbs: `beehaven help`
 - Daemon status: `beehaven status`
