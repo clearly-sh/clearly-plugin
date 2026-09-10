@@ -36,7 +36,9 @@ The plugin already wired the MCP server; the user just has to sign in. Tell them
 
 The sign-in grants scoped access (`rpc:read` for search + read; add `rpc:write` to let Claude write documents, schedule wakes, create boards/tickets). Sign out / revoke anytime with `claude mcp logout clearly` (or Settings → **Developers** in the app).
 
-> **Staging/dev:** point at the staging relay by setting `CLEARLY_MCP_URL=https://relay.clearly.sh/mcp` before launching Claude Code.
+> **Working in more than one workspace?** A client stores one credential per server entry, so two
+> workspaces behind a single entry collide. Use `https://relay.clearly.sh/mcp/w/<workspaceId>` as a
+> second entry — see [the MCP docs](https://clearly.sh/docs/mcp).
 
 ### 2. Verify
 
