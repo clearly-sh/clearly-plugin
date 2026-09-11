@@ -1,0 +1,41 @@
+{
+  "name": "clearly",
+  "version": "0.8.0",
+  "description": "Bring Clearly into your coding agent: seven typed MCP tools for documents, canvases, sheets, decks, projects, boards and tickets, plus CLI-driven workspace actions and studio-grade canvas and design skills.",
+  "author": {
+    "name": "Clearly",
+    "url": "https://clearly.sh"
+  },
+  "homepage": "https://clearly.sh/docs/mcp",
+  "repository": "https://github.com/clearly-sh/clearly-plugin",
+  "license": "MIT",
+  "keywords": [
+    "workspace",
+    "documents",
+    "company-brain",
+    "canvas",
+    "projects",
+    "tickets",
+    "design",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Clearly",
+    "shortDescription": "Work with your Clearly workspace",
+    "longDescription": "Read, write, edit and organize Clearly documents, canvases, sheets, decks, projects, boards and tickets. Use the bundled workflow and design skills for deeper workspace and canvas work.",
+    "developerName": "Clearly",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://clearly.sh",
+    "defaultPrompt": [
+      "Show me what changed in my Clearly workspace.",
+      "Turn this product work into a project, board, and tickets.",
+      "Create a PRD and keep it current as we build."
+    ]
+  }
+}

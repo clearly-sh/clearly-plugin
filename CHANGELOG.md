@@ -4,9 +4,33 @@ Notable changes to the plugin and the MCP surface it connects to.
 The surface is versioned separately from this repo — `initialize` reports it as
 `serverInfo.version`.
 
-## Unreleased
+## 0.8.0 — 2026-09-11
 
-### MCP surface 0.4.0
+### MCP surface 1.0
+
+- Replaced the former 18-tool surface with seven safety-classed tools: `clearly_catalog`,
+  `clearly_read`, `clearly_write`, `clearly_edit`, `clearly_delete`, `clearly_grep`, and
+  `clearly_glob`.
+- The four CRUD tools now cover documents, canvases, sheets, decks, projects, boards and tickets
+  through one consistent, bounded batch shape. Type- and operation-specific schemas are loaded
+  lazily through `clearly_catalog`.
+- Composition reads return the lossless scene plus its revision so a read can safely round-trip
+  through whole-scene replacement. Archive state is reported consistently across artifact types.
+- Fixed MCP lifecycle handling for `notifications/initialized` and agent attribution on document
+  archive/removal checkpoints.
+
+### Plugin
+
+- Added native Codex plugin metadata and a Codex marketplace manifest while retaining Claude Code
+  packaging.
+- Refreshed and validated all 14 bundled skills. Canvas skills now use the live CLI verbs and
+  require an authenticated agent; document guidance matches the seven-tool schemas.
+- Added the supported agent-bound Codex token path: `beehaven agent login <name>` then
+  `beehaven mcp install --client codex`.
+
+## 0.4.0
+
+### MCP surface
 
 - **Removed the unauthenticated surface.** `tools/list` and `tools/call` now resolve a credential
   before anything is dispatched. Three directory tools previously answered ahead of the auth

@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "clearly",
-      "description": "Mount your Clearly workspace as a filesystem your agent can ls, grep, read and edit \u2014 documents, projects and tickets, with every change versioned and revertable, and a status call that says what the human changed since you last looked. Adds a spatial canvas for diagrams and diffs, and design skills that hold the agent to studio craft.",
+      "description": "Bring Clearly into your coding agent: seven typed MCP tools for documents, canvases, sheets, decks, projects, boards and tickets, plus CLI-driven workspace actions and studio-grade canvas and design skills.",
       "category": "productivity",
       "source": "./plugin",
       "homepage": "https://clearly.sh"

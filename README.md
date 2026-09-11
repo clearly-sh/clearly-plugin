@@ -1,16 +1,17 @@
-# Clearly for Claude Code
+# Clearly for Claude Code and Codex
 
 [![validate](https://github.com/clearly-sh/clearly-plugin/actions/workflows/validate.yml/badge.svg)](https://github.com/clearly-sh/clearly-plugin/actions/workflows/validate.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![MCP](https://img.shields.io/badge/MCP-2025--06--18-6E56CF.svg)](https://clearly.sh/docs/mcp)
 
-Your workspace — documents, projects, tickets and a spatial canvas — addressed by your agent as a
-filesystem. Every change is versioned and revertable, and `document-status` tells the agent what
-**the human** changed since it last looked, so it re-reads instead of answering from a stale body.
+Your workspace — documents, canvases, sheets, decks, projects, boards and tickets — available to
+your coding agent through seven typed MCP tools, with deeper workspace and canvas operations via
+the `beehaven` CLI. Changes are attributed to a named agent identity, and recoverable deletes
+archive by default.
 
 <img src="./docs/what-it-is.svg" alt="Your agent connects over MCP to a Clearly workspace: documents, projects and tickets addressed as a filesystem, plus a spatial canvas. Your team sees the same workspace live." width="880">
 
-## Install
+## Install in Claude Code
 
 ```
 /plugin marketplace add clearly-sh/clearly-plugin
@@ -24,6 +25,19 @@ agent**, because every credential belongs to a named agent — that is what make
 say *who* did something rather than only *what happened*.
 
 Grant `rpc:write` unless you want the workspace read-only.
+
+## Install in Codex
+
+```bash
+codex plugin marketplace add clearly-sh/clearly-plugin
+codex plugin add clearly@clearly
+codex mcp login clearly
+```
+
+Restart Codex after installing or upgrading so it reloads the plugin's MCP definition and all 14
+skills. For a non-browser agent identity, use `beehaven agent login <name>` followed by
+`beehaven mcp install --client codex`; the installer binds the credential to that active identity
+and does not print the raw token.
 
 ## Any other MCP client
 
@@ -40,18 +54,19 @@ second at `https://relay.clearly.sh/mcp/w/<workspaceId>`.
 > answer `401` without one — carrying a `WWW-Authenticate` challenge, so a capable client starts
 > the sign-in flow by itself. See [SECURITY.md](./SECURITY.md).
 
-## The tool surface — 18
+## The tool surface — 7
 
 | | |
 |---|---|
-| **Shell** | `bash` `grep` `glob` `read` `edit` `write` `delete` — folders are projects, documents are `.md`, canvases are `.scene.json` |
-| **Dispatch** | `workspace_catalog` `workspace_invoke` `describe_action` `batch` — roughly a thousand further actions by name |
-| **Canvas** | `canvas_perceive` `canvas_act` `canvas_catalog` |
-| **Semantic** | `context_search` `thought_search` `thought_record` |
-| **Start here** | `guide` — one call, explains the rest |
+| **Discover** | `catalog` — optional, lazy schemas scoped to one artifact type and operation, plus title search |
+| **Find** | `grep` `glob` — search content or find artifacts by name |
+| **CRUD** | `read` `write` `edit` `delete` — the same four verbs cover documents, canvases, sheets, decks, projects, boards and tickets; each supports a bounded same-operation batch |
 
-Names are prefixed `clearly_`. Full reference: [`plugin/README.md`](./plugin/README.md) ·
-[setup](./plugin/SETUP.md) · [docs](https://clearly.sh/docs/mcp).
+Names are prefixed `clearly_`. The CRUD tools' top-level schemas are enough to route straightforward
+calls; use `clearly_catalog { type, operation }` before a type-specific create or edit to fetch the
+precise nested schema. Catalog is scoped by artifact type and operation, not required for every
+read. Full reference: [`plugin/README.md`](./plugin/README.md) · [setup](./plugin/SETUP.md) ·
+[docs](https://clearly.sh/docs/mcp).
 
 ## The 14 skills
 

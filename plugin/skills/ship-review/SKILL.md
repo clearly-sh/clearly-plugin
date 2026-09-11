@@ -3,22 +3,21 @@ name: ship-review
 description: Land a code change on a Clearly canvas as a spatial change-map and review it there — one crisp card per file, wired with dependency arrows, ready for the human to ink notes that you read back and act on. Load this after you finish a multi-file edit, before opening a PR, or whenever the user says "review this", "let's look at the diff", "what changed", or "put this PR on the canvas". Turns a linear diff into a reviewable map and closes the loop — human annotates → you revise.
 ---
 
-> **Tool names below are written UNPREFIXED** (`clearly_canvas_act`). Your runtime may
-> expose them with a server prefix — e.g.
-> `mcp__plugin_clearly_clearly-staging__clearly_canvas_act`. **Match by suffix, not by
-> exact name**: a skill written against the bare name resolves to nothing otherwise, and
-> the failure looks like "the tool doesn't exist" rather than "the name is decorated".
->
-> **If no such tool is callable at all**, the Clearly MCP server isn't authorised in this
-> session — note that these skills still LIST when it isn't, so you find out by firing a
-> dead call. Authorise it (`/mcp`, or `claude mcp`), or if you have a shell, use the
-> `beehaven` CLI and its own `clearly-canvas` skill instead.
+> **⚠ CANVAS WORK GOES THROUGH THE CLI, NOT AN MCP TOOL.** Anything written
+> `canvas-act { … }` / `canvas-perceive { … }` below is an ACTION, run as
+> `beehaven call canvas-act '<the JSON>'`. The payloads are exactly as shown. The MCP
+> surface is seven tools split by operation, and a single tool that dispatches 230
+> caller-named canvas actions spans reads, writes and deletes at once — which is why the
+> generic door is the shell instead. `clearly_read { target, type: "composition" }` still
+> reads a canvas as an artifact.
 
 # Ship review — diff → spatial change-map
 
 A 15-file diff is a scroll in a terminal. On a Clearly canvas it's a **map**: every file a card you can lay out, cluster, and draw relationships between — and the human reviews by gesture, inking "this breaks auth" on a card you then read back and fix. That annotate→perceive→revise loop is something a terminal diff can't do.
 
-Prereq: the `clearly` MCP is connected (run `clearly-init` if not). Read `clearly-canvas` for the primitives.
+Prereq: the `beehaven` CLI is installed, signed in as an agent, and connected to the intended
+workspace (run `clearly-init` if not). Read `clearly-canvas` for the primitives. The seven MCP
+tools are optional for artifact reads and writes.
 
 ## When to fire
 
@@ -46,7 +45,7 @@ Grab the commit subject too (`git log -1 --format=%s`) — it titles the change-
 One call does the split + layout + frame:
 
 ```jsonc
-clearly_canvas_act {
+canvas-act {
   "compositionId": "c_…",
   "action": "canvas.add-diff",
   "args": {
@@ -65,7 +64,7 @@ clearly_canvas_act {
 
 ## 3. Make it a MAP, not a list
 
-This is where you earn the canvas. After the cards land, `clearly_canvas_perceive` to get their bounds, then add structure with `clearly_canvas_act` — wire dependencies with `arrow.create {from, to}` (a first-class arrow that binds to the cards + follows them; see `clearly-canvas` → Arrows / connectors):
+This is where you earn the canvas. After the cards land, `canvas-perceive` to get their bounds, then add structure with `canvas-act` — wire dependencies with `arrow.create {from, to}` (a first-class arrow that binds to the cards + follows them; see `clearly-canvas` → Arrows / connectors):
 
 - **Dependency arrows** — when file A now imports/calls something new in file B, draw a vector arrow A→B. The reviewer instantly sees the blast radius.
 - **Cluster by concern** — `canvas.update-nodes` to move cards into groups (API / UI / tests / migration). Drop a `text` heading over each cluster.
@@ -79,7 +78,7 @@ A good change-map answers "what changed, how do the pieces relate, and where sho
 Tell the user: *"It's on the canvas — pan through, drop a comment or ink on any card you want changed."* Then:
 
 ```jsonc
-clearly_canvas_perceive { "compositionId": "c_…", "format": "text" }
+canvas-perceive { "compositionId": "c_…", "format": "text" }
 ```
 
 Their annotations come back in `contents` (new text/ink nodes near a card) and `focus` (what they selected). Read them, map each note to its file card (by proximity to the card's bounds), make the code change, and either push a fresh `canvas.add-diff` of the revision or `canvas.update-nodes` the card with a "✓ addressed" marker. Repeat until the board is clean.

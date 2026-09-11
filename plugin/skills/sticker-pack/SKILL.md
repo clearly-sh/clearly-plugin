@@ -3,32 +3,32 @@ name: sticker-pack
 description: Turn an idea into a printable, die-cut STICKER SHEET on a Clearly canvas — Clearly's own sticker-vending-machine pipeline surfaced as an agent skill. Generates a cohesive SET of transparent stickers, lays them out as a sheet (frame + gridded stickers + a vector kiss-cut cutline layer), and hands back a print-ready bundle. Load this when the user says "make me stickers / a sticker pack / a sticker sheet about X", "turn this into stickers", "design stickers for my brand / startup / cat", or "I want die-cut stickers". The fun, inherently-shareable corner of the canvas skill set.
 ---
 
-> **Tool names below are written UNPREFIXED** (`clearly_canvas_act`). Your runtime may
-> expose them with a server prefix — e.g.
-> `mcp__plugin_clearly_clearly-staging__clearly_canvas_act`. **Match by suffix, not by
-> exact name**: a skill written against the bare name resolves to nothing otherwise, and
-> the failure looks like "the tool doesn't exist" rather than "the name is decorated".
->
-> **If no such tool is callable at all**, the Clearly MCP server isn't authorised in this
-> session — note that these skills still LIST when it isn't, so you find out by firing a
-> dead call. Authorise it (`/mcp`, or `claude mcp`), or if you have a shell, use the
-> `beehaven` CLI and its own `clearly-canvas` skill instead.
+> **⚠ CANVAS AND STICKER WORK GO THROUGH THE CLI, NOT AN MCP TOOL.** Anything written
+> `beehaven call <action>` below is a literal command. The MCP surface is seven tools split
+> by operation; the ~1,000 workspace actions are reached by name through the shell.
 
 # Sticker pack — idea → printable die-cut sheet
 
 Stickers are the most organically viral thing Clearly makes: a generated die-cut pack someone actually prints and slaps on a laptop *is* the share. This skill drives Clearly's real sticker-vending pipeline — the same one behind the studio — straight onto a canvas.
 
-Read `clearly-canvas` first for the primitives + the perceive→act→revise loop. This skill adds the **generation** step on top of it.
+Install the `beehaven` CLI, sign in as an agent, and connect the intended workspace first
+(`clearly-init` handles setup). Then read `clearly-canvas` for the primitives and the
+perceive→act→revise loop. This skill adds the **generation** step on top of it.
 
 ## The one core tool (and a heads-up)
 
 The sticker pipeline runs through **`sticker-sheet-gen`**, a real workspace action. It is NOT (yet) a dedicated MCP tool, so you call it through the generic dispatcher:
 
 ```jsonc
-clearly_workspace_invoke { "action": "sticker-sheet-gen", "input": { … } }
+beehaven call sticker-sheet-gen '{ … }'
 ```
 
-> Needs a first-class `clearly_sticker_generate` MCP tool to be fully turnkey (autocomplete + schema). Until then `clearly_workspace_invoke` is the honest, working path — the action itself is production code, the same pipeline the paid studio uses.
+> ⚠ **This is a CLI action, not an MCP tool, and that is settled rather than pending.**
+> `clearly_sticker_generate` **does not exist** and is not planned — an earlier version of this
+> note called it a missing piece. The MCP surface is seven tools split by operation, and a
+> per-feature tool for every workspace action is the 139-tool surface that was withdrawn. The
+> action is production code — the same pipeline the paid studio uses — and the CLI reaches it with
+> full attribution.
 
 **It is slow (30–90s), async, and costs the user a sheet credit.** Pass a `compositionId` and the pipeline does the canvas work for you: when the art lands, it places a **transparent parent frame ("Sticker sheet")**, every cut-out sticker nested as its own `image` node (drag one out!), and the **die-cut contour as a nested vector `svg` layer ("Cutline (kiss-cut)")**. The cutline is true vector — exported as the spot cut layer, never rasterized.
 
@@ -47,20 +47,17 @@ A sticker sheet is ONE generation, not N — the model draws the whole cohesive 
 Make a canvas first (or reuse one), then fire the gen with `compositionId` so it lands:
 
 ```jsonc
-clearly_workspace_invoke { "action": "composition-create", "input": { "title": "Plant shop stickers" } }
+beehaven call composition-create '{ "title": "Plant shop stickers" }'
 // → { "id": "c_…" }
 
-clearly_workspace_invoke {
-  "action": "sticker-sheet-gen",
-  "input": {
-    "compositionId": "c_…",
-    "prompt": "cottagecore plant-shop stickers: monstera leaf, watering can, terracotta pot, snail, sun, seed packet — flat color, chunky outlines, sage green + terracotta palette",
-    "style": "cottagecore",
-    "stickerCount": 9,
-    "bleedStyle": "halo",
-    "aspectRatio": "2:3"
-  }
-}
+beehaven call sticker-sheet-gen '{
+  "compositionId": "c_…",
+  "prompt": "cottagecore plant-shop stickers: monstera leaf, watering can, terracotta pot, snail, sun, seed packet — flat color, chunky outlines, sage green + terracotta palette",
+  "style": "cottagecore",
+  "stickerCount": 9,
+  "bleedStyle": "halo",
+  "aspectRatio": "2:3"
+}'
 // → { ok:true, sheetId:"sht_…", stickerCount:9, sheetUrl:"https://…", placed:{ stickers:9, cutline:true } }
 ```
 
@@ -80,7 +77,7 @@ Input shape (all optional except `prompt`):
 **Handle the async/loading case.** If the response is `{ sessionId, timedOut: true }` (no `placed`), the gen is still running — the ⏳ placeholder is already on the canvas. Poll until the real frame lands:
 
 ```jsonc
-clearly_canvas_perceive { "compositionId": "c_…", "format": "text" }
+canvas-perceive { "compositionId": "c_…", "format": "text" }
 // look in `contents` for a frame named "Sticker sheet" with image children
 // + an svg layer "Cutline (kiss-cut)". When it's there, the sheet is done.
 ```
@@ -89,7 +86,7 @@ On a hard failure the response carries an `error` (`no_exports_remaining` → us
 
 ## 3. The sheet is already laid out — make it presentable
 
-The pipeline placed the frame, the cut-out stickers (gridded, native pixel size), and the cutline layer in ONE write. Your job is polish, via `clearly_canvas_act` (see `clearly-canvas`):
+The pipeline placed the frame, the cut-out stickers (gridded, native pixel size), and the cutline layer in ONE write. Your job is polish, via `canvas-act` (see `clearly-canvas`):
 
 - **Perceive first**, read the `backgroundColor`, then drop a `text` title over the frame: "Plant shop · 9 stickers · kiss-cut".
 - A tiny caption noting the **"Cutline (kiss-cut)"** layer is the spot cut path (vector) — toggle it to preview the die-cut.
@@ -102,7 +99,7 @@ Don't rebuild the grid by hand — the pipeline already nested everything correc
 When they're happy, pull the print kit:
 
 ```jsonc
-clearly_workspace_invoke { "action": "sticker-sheet-export", "input": { "sheetId": "sht_…" } }
+beehaven call sticker-sheet-export '{ "sheetId": "sht_…" }'
 // → { zipUrl, pdfUrl, sheetUrl, stickerUrls:[…], stickerCount, hasCutFile:true }
 ```
 
@@ -122,14 +119,14 @@ A real die-cut pack — transparent stickers, a visible kiss-cut contour, a prin
 
 ## Single-sticker fallback
 
-For ONE sticker (not a sheet) use `studio-image-generate` (raster or `format:'svg'` for a cut-ready vector) and place it with `clearly_canvas_act`. If `sticker-sheet-gen` is ever unavailable, the manual sheet = `studio-image-generate` per concept (transparent), then `clearly_canvas_act` → `frame.create` + one `canvas.create-node {type:'image'}` per sticker on a grid + a `canvas.create-node {type:'svg'}` cutline outline. But that's the cold path — the pipeline above is the real, supported one.
+For ONE sticker (not a sheet) use `studio-image-generate` (raster or `format:'svg'` for a cut-ready vector) and place it with `canvas-act`. If `sticker-sheet-gen` is ever unavailable, the manual sheet = `studio-image-generate` per concept (transparent), then `canvas-act` → `frame.create` + one `canvas.create-node {type:'image'}` per sticker on a grid + a `canvas.create-node {type:'svg'}` cutline outline. But that's the cold path — the pipeline above is the real, supported one.
 
 ## Rules of thumb
 
 - **One gen = one whole sheet.** Don't loop the call per sticker; the model draws the cohesive grid in a single pass.
 - **Always pass `compositionId`** — that's what lands the placeholder, frame, stickers, and cutline. No `compositionId` = no canvas output.
 - **It's slow + costs a credit.** Confirm the brief BEFORE generating; relay `no_exports_remaining` / `rate_limit_exceeded` plainly (credit auto-refunds on failure).
-- **`timedOut:true` ≠ failed** — the gen is still running; `clearly_canvas_perceive` until the "Sticker sheet" frame appears.
+- **`timedOut:true` ≠ failed** — the gen is still running; `canvas-perceive` until the "Sticker sheet" frame appears.
 - **The cutline is vector** ("Cutline (kiss-cut)" svg layer) — it's the spot cut path; the export SVG/PDF is what a plotter cuts.
 - **Iterate by re-genning**, reuse `seed` to hold a look, then **export last**.
-- **Reach `sticker-sheet-gen` / `sticker-sheet-export` via `clearly_workspace_invoke`** (not a dedicated MCP tool yet).
+- **Reach `sticker-sheet-gen` / `sticker-sheet-export` with `beehaven call`** — they are workspace actions, not MCP tools, and will not become tools.

@@ -12,9 +12,9 @@ description: >-
   knowledge", "so nobody has to work this out again".
 ---
 
-> **Tool names below are written UNPREFIXED** (`clearly_canvas_act`). Your runtime may
+> **Tool names below are written UNPREFIXED** (`clearly_read`). Your runtime may
 > expose them with a server prefix — e.g.
-> `mcp__plugin_clearly_clearly-staging__clearly_canvas_act`. **Match by suffix, not by
+> `mcp__plugin_clearly_clearly-staging__clearly_read`. **Match by suffix, not by
 > exact name**: a skill written against the bare name resolves to nothing otherwise, and
 > the failure looks like "the tool doesn't exist" rather than "the name is decorated".
 >
@@ -31,11 +31,11 @@ If the `clearly` server isn't connected yet, run the `clearly-init` skill first.
 
 ## 1. Orient before you act
 
-Call `clearly_context_map` once at the start. It returns the brain's size (prompts / responses / facts), the recurring topics, and the org/teams it can federate across. Use it to decide whether the answer already exists.
+Run `beehaven call context-map` once at the start. It returns the brain's size (prompts / responses / facts), the recurring topics, and the org/teams it can federate across. Use it to decide whether the answer already exists.
 
 ## 2. Retrieve context (don't re-derive it)
 
-`clearly_context_search { query, scope?, kinds?, limit? }` is ONE ranked search across prompts, agent responses, documents/PRDs, and facts — use it instead of guessing or asking the user what they already decided.
+`beehaven call context-search '{ "query": …, "scope"?, "kinds"?, "limit"? }'` is ONE ranked search across prompts, agent responses, documents/PRDs, and facts — use it instead of guessing or asking the user what they already decided.
 
 - `scope: "workspace"` (default) searches this workspace.
 - `scope: "org"` **federates across every workspace in the org**, merges + re-ranks by relevance, and excludes private artifacts + personal facts. Use it for "what has anyone on the team decided/built about X".
@@ -47,33 +47,35 @@ Each hit carries `kind`, `ref` (the id to fetch in full), `title`, `snippet`, `s
 
 ## 3. Write context BACK so it compounds
 
-When you produce something durable — a PRD, a decision, a spec, a research summary — file it with `clearly_context_write`:
+When you produce something durable — a PRD, a decision, a spec, a research summary — file it with `context-write`:
 
 ```jsonc
-clearly_context_write {
+beehaven call context-write '{
   "title": "Per-seat billing decision",
   "body":  "We charge per seat; usage is per-seat with shared top-up overflow. Rationale: …",
   "kind":  "decision",          // doc | note | decision | prd
   "tags":  ["billing","pricing"],
   "fact":  "Billing is per-seat with shared top-up",   // optional one-line takeaway
   "private": false               // true → workspace-local, never federated across the org
-}
+}'
 ```
 
-It creates the document AND files a searchable catalog entry, so the very next `clearly_context_search` finds it. Mark anything sensitive `private: true`.
+It creates the document AND files a searchable catalog entry, so the very next `context-search` finds it. Mark anything sensitive `private: true`.
+
+⚠ **Why these are CLI calls and not MCP tools.** The MCP surface is seven tools split by what they do to an artifact (`clearly_catalog · _read · _write · _edit · _delete · _grep · _glob`); the Company Brain's verbs are workspace ACTIONS, reached by name through the shell. Once a document exists, `clearly_grep` and `clearly_read` open it like any other.
 
 ## 4. Inherit the team's skills
 
 The workspace has its own skills (procedures the team grew). Before improvising a multi-step task, check whether one exists:
 
-- `clearly_skill_list { includeWorkspace: true }` → the skill cards (name + when-to-use).
-- `clearly_skill_get { id }` → the full step-by-step instructions for the one whose trigger matches.
+- `beehaven call skill-list '{"includeWorkspace":true}'` → the skill cards (name + when-to-use).
+- `beehaven call skill-get '{"id":"…"}'` → the full step-by-step instructions for the one whose trigger matches.
 
 Follow the loaded procedure rather than inventing your own — that's how you work *the way this workspace works*.
 
 ## Anything else
 
-`clearly_workspace_catalog` lists all ~200 workspace actions with schemas; `clearly_workspace_invoke { action, input }` runs any of them. Reach for these when the typed tools above don't cover what you need.
+`beehaven actions` lists every workspace action with its description; `beehaven call <action> '<json>'` runs one. Reach for these when the seven MCP tools don't cover what you need — which is most things beyond reading, writing and searching artifacts.
 
 ## Rules of thumb
 
@@ -84,4 +86,4 @@ Follow the loaded procedure rather than inventing your own — that's how you wo
      2026-08-02: the tool is in ZERO entries of mcp-server.ts's tool list and `schedule-wake` is
      not a registered RPC, so every example here failed. Restore only when it is in tools/list. -->
 
-- **Check `clearly_skill_list`** before hand-rolling a known procedure.
+- **Check `beehaven call skill-list`** before hand-rolling a known procedure.
