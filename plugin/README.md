@@ -4,7 +4,7 @@ Your **company brain** in Claude Code. Search org context (prompts, docs, decisi
 
 ## What's in the box
 
-- **Pre-configured MCP server** pointing at `https://relay.clearly.sh/mcp` — ~48 tools, including the Company Brain (`clearly_context_search` / `_write` / `_map`), the **spatial canvas** (`clearly_canvas_perceive` / `_act` / `_catalog`), skills (`clearly_skill_list` / `_get`), and the full ~200-action catalog via `clearly_workspace_invoke`.
+- **Pre-configured MCP server** pointing at `https://relay.clearly.sh/mcp` — **18 tools**: the workspace as a filesystem (`clearly_bash` / `_grep` / `_glob` / `_read` / `_edit` / `_write` / `_delete`), the **spatial canvas** (`clearly_canvas_perceive` / `_act` / `_catalog`), semantic search (`clearly_context_search`, `clearly_thought_search` / `_record`), and roughly a thousand further actions by name via `clearly_workspace_catalog` + `clearly_workspace_invoke`. Everything requires a credential; there is no anonymous access.
 - **Skills:**
   - **`clearly-init`** — setup: sign in over OAuth (browser), verify `/mcp`.
   - **`clearly-workflows`** — company-brain usage: search → write back → schedule.
@@ -65,7 +65,7 @@ Devs with this monorepo checked out can skip the public repo and add the local p
 
 > **Publishing note:** external users need a public repo to `marketplace add`. Publish the contents of this folder (`apps/mcp-server/plugin/` — plus a root `.claude-plugin/marketplace.json`) to `clearly-sh/clearly-plugin`. The remote MCP needs nothing published.
 
-Run `/clearly:init` to walk through the browser sign-in and verify the connection. The `clearly-workflows` skill loads automatically when you work a connected workspace.
+Run `/clearly:clearly-init` to walk through the browser sign-in and verify the connection (or read [SETUP.md](./SETUP.md)). The `clearly-workflows` skill loads automatically when you work a connected workspace.
 
 ## What you can do once connected
 
