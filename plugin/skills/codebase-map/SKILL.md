@@ -3,20 +3,22 @@ name: codebase-map
 description: Walk a code repository and draw a living ARCHITECTURE MAP of it on a Clearly spatial canvas — modules as frames (sized by LOC, colored by layer), key files as nodes, imports/dependencies as arrows — so the big pieces, how they depend on each other, and where the complexity sits all read at a glance. Load this when the user says "map / diagram / visualize this codebase / repo / architecture", "how is this project structured", "draw the dependency graph", "give me an architecture overview", or when you're onboarding to an unfamiliar repo and need to see its shape fast.
 ---
 
-> **Tool names below are written UNPREFIXED** (`clearly_canvas_act`). Your runtime may
-> expose them with a server prefix — e.g.
-> `mcp__plugin_clearly_clearly-staging__clearly_canvas_act`. **Match by suffix, not by
-> exact name**: a skill written against the bare name resolves to nothing otherwise, and
-> the failure looks like "the tool doesn't exist" rather than "the name is decorated".
->
-> **If no such tool is callable at all**, the Clearly MCP server isn't authorised in this
-> session — note that these skills still LIST when it isn't, so you find out by firing a
-> dead call. Authorise it (`/mcp`, or `claude mcp`), or if you have a shell, use the
-> `beehaven` CLI and its own `clearly-canvas` skill instead.
+> **⚠ CANVAS WORK GOES THROUGH THE CLI, NOT AN MCP TOOL.** Anything written
+> `canvas-act { … }` / `canvas-perceive { … }` below is an ACTION, run as
+> `beehaven call canvas-act '<the JSON>'`. The payloads are exactly as shown. The MCP
+> surface is seven tools split by operation, and a single tool that dispatches 230
+> caller-named canvas actions spans reads, writes and deletes at once — which is why the
+> generic door is the shell instead. `clearly_read { target, type: "composition" }` still
+> reads a canvas as an artifact.
 
 # Codebase map — repo → spatial architecture diagram
 
-A `tree` dump is 400 files of noise. The thing a dev actually wants is the **shape**: ~8 boxes, sized by weight, wired by who-imports-whom, with the hot, gnarly module obvious. You have host tools (Bash, Read, Grep, Glob) to *inspect* the repo and the Clearly canvas tools to *draw* it. Read `clearly-canvas` for the primitives + the locked tool contract — this skill builds on it (perceive → act → revise; `frame.create`; `canvas.create-node` text/rect/svg; nesting via `parentId`; arrows = `arrow.create {from,to}` (a first-class arrow that binds to the boxes + follows them; `routing:"elbow"` + `label` for wiring diagrams); always `compositionId`). Don't re-derive that here.
+A `tree` dump is 400 files of noise. The thing a dev actually wants is the **shape**: ~8 boxes,
+sized by weight, wired by who-imports-whom, with the hot, gnarly module obvious. Use the host shell
+to inspect the repo and the `beehaven` CLI to draw it. Sign in as an agent and connect the intended
+workspace first; `clearly-init` handles setup. Read `clearly-canvas` for the primitives and the
+locked tool contract — this skill builds on it (perceive → act → revise; `frame.create`;
+`canvas.create-node`; frame-relative nesting; bound `arrow.create`; always `compositionId`).
 
 ## 1. Discover the structure (host shell)
 
@@ -66,14 +68,14 @@ Pick the **~6–12 modules that matter** — never every file. A 40-file `compon
 Get a canvas, then **perceive the background first** so you paint with it (dark board → light ink), and place the map in the user's `gaze`:
 
 ```jsonc
-clearly_workspace_invoke { "action": "composition-create", "input": { "title": "Architecture map · clearly" } }   // → { id: "c_…" }
-clearly_canvas_perceive  { "compositionId": "c_…", "format": "text" }   // read backgroundColor + visibleWorldRect
+beehaven call composition-create '{"title":"Architecture map · clearly"}'   // → { id: "c_…" }
+canvas-perceive  { "compositionId": "c_…", "format": "text" }   // read backgroundColor + visibleWorldRect
 ```
 
-Then batch the whole map in one `clearly_canvas_act`. Capture the frame ids the creates return so you can nest + connect. **Size each frame ~proportional to LOC** (e.g. `w ≈ 160 + LOC/40`, clamp 200–420), **fill by layer color**, lay out on a grid with 40px gutters:
+Then batch the whole map in one `canvas-act`. Capture the frame ids the creates return so you can nest + connect. **Size each frame ~proportional to LOC** (e.g. `w ≈ 160 + LOC/40`, clamp 200–420), **fill by layer color**, lay out on a grid with 40px gutters:
 
 ```jsonc
-clearly_canvas_act {
+canvas-act {
   "compositionId": "c_…",
   "batch": [
     { "action": "canvas.create-node", "args": { "type": "text", "name": "map-title",
@@ -88,10 +90,10 @@ clearly_canvas_act {
 }
 ```
 
-Then a second `clearly_canvas_act` once you hold the frame ids — **titles + stats inside each frame** (coords are frame-relative via `parentId`), **key files as nodes**, and **dependency arrows** spanning the gap between frames (use bounds from perceive):
+Then a second `canvas-act` once you hold the frame ids — **titles + stats inside each frame** (coords are frame-relative via `parentId`), **key files as nodes**, and **dependency arrows** spanning the gap between frames (use bounds from perceive):
 
 ```jsonc
-clearly_canvas_act {
+canvas-act {
   "compositionId": "c_…",
   "batch": [
     { "action": "canvas.create-node", "args": { "type": "text", "name": "ui-title",
@@ -137,4 +139,4 @@ A beautiful, auto-generated architecture map — modules sized by weight, layers
 - **Size by LOC, color by layer**, one module red as the hotspot.
 - **Arrows only for REAL dependencies** (A imports B → A→B); thicker = heavier coupling. Don't decorate, inform.
 - **`name` is required on every create**; capture returned frame ids to nest + connect.
-- **Need an action not listed?** `clearly_canvas_catalog { surface: "all" }` describes every one.
+- **Need an action not listed?** `canvas-catalog { surface: "all" }` describes every one.

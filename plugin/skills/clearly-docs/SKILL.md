@@ -1,19 +1,18 @@
 ---
 name: clearly-docs
 description: >-
-  Read, search, edit and version a company's documents in a Clearly workspace
-  over MCP — the workspace mounts as a FILESYSTEM, every change carries a commit
-  message and is revertable, and `document-status` tells you what the HUMAN
-  changed since you last looked so you re-read instead of answering from a stale
-  body. Use whenever the answer depends on what the company has written down, or
-  when you are about to write something down for it. Triggers: "what do our docs
-  say", "find the doc about X", "update the spec", "write this up", "add it to
-  the docs", "has this changed", "what did they edit", "search the wiki",
-  "company knowledge", "our documentation", "the PRD", "the runbook".
+  Read, search, edit and recover a company's documents in a Clearly workspace.
+  Use the seven-tool MCP filesystem for ordinary work; use the `beehaven` CLI
+  only for document history, diffs, and restore. Load this whenever the answer
+  depends on what the company has written down, or when you are about to write
+  something down for it. Triggers: "what do our docs say", "find the doc about
+  X", "update the spec", "write this up", "add it to the docs", "has this
+  changed", "what did they edit", "search the wiki", "company knowledge", "our
+  documentation", "the PRD", "the runbook".
 ---
 
-> **Tool names below are written UNPREFIXED** (`clearly_bash`). Your runtime may expose them
-> with a server prefix — e.g. `mcp__plugin_clearly_clearly__clearly_bash`. **Match by suffix,
+> **Tool names below are written UNPREFIXED** (`clearly_read`). Your runtime may expose them
+> with a server prefix — e.g. `mcp__plugin_clearly_clearly__clearly_read`. **Match by suffix,
 > not by exact name**: a skill written against the bare name resolves to nothing otherwise, and
 > the failure looks like "the tool doesn't exist" rather than "the name is decorated".
 >
@@ -39,43 +38,46 @@ the full name and the bare title.
 
 ## The loop
 
-**`clearly_bash` is a real shell over `~`** — `ls`, `cd`, `cat`, `grep`, `find`, `tree`, `head`,
-`tail`, `wc`, `sort`, `jq`, pipes and redirects. The working directory persists between calls.
+**Find it, then open it.** `clearly_glob` answers "what is it called", `clearly_grep` answers
+"where is this mentioned", and `clearly_read` opens what either one returned.
 
 ```
-clearly_bash  ls ~
-clearly_bash  grep -ril pricing ~ | head -5
-clearly_bash  cat "~/Prepress/CLR-42 Pricing.md"
+clearly_glob  { pattern: "~/**/*.md" }
+clearly_grep  { pattern: "pricing", limit: 5 }
+clearly_read  { target: "~/Prepress/CLR-42 Pricing.md" }
 ```
 
-⚠ **A pattern containing `|`, `(`, `$`, `>` or a quote goes to `clearly_grep`, not to the
-shell.** The shell parses your string before grep sees it, so those become pipes, groups and
-redirects and match nothing — which looks exactly like a workspace that has nothing in it.
+⚠ **`clearly_grep` takes a REGEX, unparsed** — `|`, `(`, `$` and quotes mean what they mean in a
+regular expression. Nothing shells out, so nothing eats them as syntax first.
 
-**Structural questions go to SQL**, because they have no keyword to search for:
+⚠ **Archived documents are excluded from both.** When any matched, the result carries
+`archivedHidden` saying how many — mention that rather than reporting a clean miss. Search the
+archive by naming it: `clearly_grep { pattern: …, path: "~/.archive" }`.
+
+**Structural questions — a date range, a null body, counts — have no keyword to search for**, so
+they go to SQL over the workspace's own tables. That is a CLI job, not an MCP tool:
 
 ```
-clearly_bash  sql SELECT title, updated_at FROM notes WHERE project_id IS NULL LIMIT 20
+beehaven call bash '{"command":"sql SELECT title, updated_at FROM notes WHERE project_id IS NULL LIMIT 20"}'
 ```
 
 Read-only, one statement, credential columns redacted.
 
-## ⚠⚠ Read before you write, and check what THEY changed
+## ⚠⚠ Read before you write, and check what changed
 
 This is the part that makes documentation stay true, and it is the part agents skip.
 
-Every edit **you** make returns a diff. The human's edits return nothing — so without asking,
-you know exactly what you did and nothing about what they did, and you will answer from a body
-you read an hour ago as though it were still on screen.
+The MCP read/edit/write tools cover the current body. Document history is a separate CLI surface:
 
-- **`document-status`** is `git status` for their documents: which changed, and **`by: you` vs
-  `by: them`**. That distinction is the whole point — "four documents changed" is not
-  actionable; "you changed three and they changed the fourth" tells you exactly which one to
-  re-read.
-- **`document-diff <doc>`** is the follow-up: the lines added and removed.
+- **`beehaven call document-status '{"limit":20}'`** lists recent changes. `mine: true` is the
+  certain signal that the active agent made the latest change. `by: "unknown"` means the log has
+  no author; it may be a browser edit or an older unstamped agent write, so do not claim a person
+  made it.
+- **`beehaven call document-diff '{"id":"<documentId>"}'`** follows up with added and removed
+  lines. Pass a `versionId` from status to compare against a specific checkpoint.
 
-Run `document-status` when you resume a conversation, and whenever they say something implying
-they have been working — *"I rewrote that"*, *"take another look"*.
+Run status when you resume a conversation, and whenever they say something implying the document
+has moved — *"I rewrote that"*, *"take another look"*.
 
 ⚠ **Their edit wins, always.** If a document now disagrees with something you concluded
 earlier, your conclusion is the stale one. You are keeping their documents, not defending your
@@ -92,16 +94,12 @@ whatever you last read, overwriting anything the human changed in between.
 - `clearly_edit` requires the `find` text to match **exactly once**. Ambiguity is REFUSED with a
   count, never guessed — an agent that edits the first of three matches has changed something
   nobody looked at.
-- Several changes to one document is **one `multi_edit`**, not three edits. Three edits is three
-  versions, three reindexes and three redraws for one change — and if the third is refused the
-  document is left half-done with nothing on screen saying so.
-- Overwriting an existing document? Pass `expected_content` (the body as you last read it). If
-  it moved underneath you the write is refused and you get a diff. Their version wins; redo your
-  change on top of it.
-
-**Every mutation takes a `message`** — a commit message, imperative, a few words: *"Cut the
-three-credit line"*, *"Add the 12-hour window"*. Not *"updated the note"*, which says nothing.
-It is the only part of your work that outlives the conversation in words rather than bytes.
+- Several independent document edits can be sent in one tool call with `batch`, but each batch
+  row is still one exact `{ target, find, replace, all? }` operation. There is no `multi_edit`
+  field and the batch is not transactional; inspect the per-item results and retry only failures.
+- `clearly_write` does not accept `expected_content` or a commit-message field. If you must replace
+  a whole existing document, re-read it immediately before writing and verify the returned body.
+  Prefer `clearly_edit` whenever a precise passage change can express the job.
 
 ## `clearly.md` — what is settled
 

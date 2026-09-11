@@ -4,16 +4,13 @@ description: Turn any concept, answer, or described system into a clean DIAGRAM 
   "explain visually", "show me how X works", "flowchart this", "make a diagram" — AND proactively whenever YOUR OWN answer would be clearer as a picture than a paragraph (a flow with branches, who-calls-whom, a schema, an architecture, options on axes). Picks the right diagram type for the content and builds it with the canvas primitives.
 ---
 
-> **Tool names below are written UNPREFIXED** (`clearly_canvas_act`). Your runtime may
-> expose them with a server prefix — e.g.
-> `mcp__plugin_clearly_clearly-staging__clearly_canvas_act`. **Match by suffix, not by
-> exact name**: a skill written against the bare name resolves to nothing otherwise, and
-> the failure looks like "the tool doesn't exist" rather than "the name is decorated".
->
-> **If no such tool is callable at all**, the Clearly MCP server isn't authorised in this
-> session — note that these skills still LIST when it isn't, so you find out by firing a
-> dead call. Authorise it (`/mcp`, or `claude mcp`), or if you have a shell, use the
-> `beehaven` CLI and its own `clearly-canvas` skill instead.
+> **⚠ CANVAS WORK GOES THROUGH THE CLI, NOT AN MCP TOOL.** Anything written
+> `canvas-act { … }` / `canvas-perceive { … }` below is an ACTION, run as
+> `beehaven call canvas-act '<the JSON>'`. The payloads are exactly as shown. The MCP
+> surface is seven tools split by operation, and a single tool that dispatches 230
+> caller-named canvas actions spans reads, writes and deletes at once — which is why the
+> generic door is the shell instead. `clearly_read { target, type: "composition" }` still
+> reads a canvas as an artifact.
 
 # Visualize — draw it, don't write it
 
@@ -21,7 +18,11 @@ Some answers are paragraphs. Many are **pictures pretending to be paragraphs**: 
 
 So: when you catch yourself about to write three paragraphs explaining how something connects, **draw it on the canvas instead** (and you can still say the one-line version in chat).
 
-Prereq: the `clearly` MCP is connected (run `clearly-init` if not). **Read `clearly-canvas` for the tool contract** — `perceive` / `act` / `catalog`, `frame.create`, `canvas.create-node` (text/rect/ellipse/svg/line), arrows-as-vector-SVG, nesting via `parentId` with frame-relative coords. This skill is the *diagram cookbook* on top of those primitives; it does not repeat them.
+Prereq: the `beehaven` CLI is installed, signed in as an agent, and connected to the intended
+workspace (run `clearly-init` if not). **Read `clearly-canvas` for the tool contract** —
+`canvas-perceive` / `canvas-act` / `canvas-catalog`, `frame.create`, `canvas.create-node`
+(text/rect/ellipse/svg/line), first-class `arrow.create`, and nesting via `parentId` with
+frame-relative coordinates. This skill is the *diagram cookbook* on top of those primitives.
 
 ## Pick the type (1-line heuristic each)
 
@@ -39,8 +40,8 @@ When unsure, ask: *is the story "then" (flowchart), "who" (sequence), "what's-re
 
 ## The build loop (every diagram)
 
-1. **Get a canvas + perceive.** `clearly_canvas_perceive { compositionId, format:"text" }` → read `backgroundColor` (design WITH it — light ink on dark, dark ink on light) and `gaze.visibleWorldRect` (place work where the user is looking).
-2. **Batch the skeleton.** One `clearly_canvas_act` with a `batch` of frames + boxes on a grid. Capture every returned `{ id }`.
+1. **Get a canvas + perceive.** `canvas-perceive { compositionId, format:"text" }` → read `backgroundColor` (design WITH it — light ink on dark, dark ink on light) and `gaze.visibleWorldRect` (place work where the user is looking).
+2. **Batch the skeleton.** One `canvas-act` with a `batch` of frames + boxes on a grid. Capture every returned `{ id }`.
 3. **Wire the arrows** with `arrow.create {from, to}` — a first-class arrow that BINDS to the boxes (by returned id OR layer name) and FOLLOWS them when they move; `routing:"elbow"` for orthogonal flowcharts, `label` for the edge text (no separate label node needed). See clearly-canvas → Arrows / connectors.
 4. **Label** edges/branches with small `text` nodes at arrow midpoints.
 5. **Re-perceive** so the user can ink notes; read them back; revise with `canvas.update-nodes`.
@@ -54,7 +55,7 @@ Grid discipline matters more than anything: equal gutters (24–40px), aligned e
 Your default upgrade from prose. **Layout:** 3–6 labelled boxes left→right (or top→down) in the order you'd say them, one arrow per "and then / because / leads to", a title text on top.
 
 ```jsonc
-clearly_canvas_act { "compositionId": "c_…", "batch": [
+canvas-act { "compositionId": "c_…", "batch": [
   { "action": "canvas.create-node", "args": { "type":"text", "name":"title", "text":"How a request gets billed", "x":0, "y":-40, "size":24, "fontWeight":700, "fill":"#fff" } },
   { "action": "canvas.create-node", "args": { "type":"rect", "name":"b1", "x":0,   "y":0, "w":180, "h":72, "fill":"#1b2230", "stroke":"#3a465c", "radius":10 } },
   { "action": "canvas.create-node", "args": { "type":"text", "name":"b1t", "text":"Member acts", "x":16, "y":26, "size":15, "fontWeight":600, "fill":"#e8edf5" } },
@@ -71,7 +72,7 @@ Chain more boxes at `x += 260` per step. Branch (e.g. "budget exhausted → top-
 **Layout:** boxes top→down (or left→right), **rounded rect = action**, **diamond = decision**. Draw a diamond as a `type:"svg"` rhombus; give it two outgoing arrows labelled **Yes / No**.
 
 ```jsonc
-clearly_canvas_act { "compositionId":"c_…", "batch":[
+canvas-act { "compositionId":"c_…", "batch":[
   { "action":"canvas.create-node", "args":{ "type":"rect", "name":"start", "x":120, "y":0, "w":160, "h":56, "fill":"#173a2a", "stroke":"#2f6b4d", "radius":28 } },
   { "action":"canvas.create-node", "args":{ "type":"text", "name":"startt", "text":"Invite sent", "x":156, "y":18, "size":14, "fontWeight":600, "fill":"#d6f5e4" } },
   { "action": "arrow.create", "args": { "from":"start", "to":"decide", "label":"yes", "routing":"elbow" } },
@@ -86,7 +87,7 @@ Rules: one entry, decisions are the only nodes with >1 exit, **every arrow label
 **Layout:** each actor is a column — a header box at top + a vertical lifeline (`type:"line"`) running down. Messages are **horizontal arrows** between lifelines; **time flows down**, so each later message sits at a larger `y`.
 
 ```jsonc
-clearly_canvas_act { "compositionId":"c_…", "batch":[
+canvas-act { "compositionId":"c_…", "batch":[
   { "action":"canvas.create-node", "args":{ "type":"rect", "name":"a1", "x":0,   "y":0, "w":120, "h":40, "fill":"#1b2230", "stroke":"#3a465c", "radius":8 } },
   { "action":"canvas.create-node", "args":{ "type":"text", "name":"a1t", "text":"Web", "x":48, "y":12, "size":14, "fontWeight":600, "fill":"#e8edf5" } },
   { "action":"canvas.create-node", "args":{ "type":"line", "name":"a1life", "x":60, "y":40, "w":0, "h":300, "stroke":"#3a465c" } },
@@ -105,7 +106,7 @@ Place the message text just above its arrow. A return/response arrow points back
 **Layout:** each service is a `frame` (so it can hold a label + sub-parts); **data stores are cylinders** drawn as `type:"svg"`; arrows are calls. Cluster by tier — a row of frames per tier (client / edge / data), with a faint heading text per row.
 
 ```jsonc
-clearly_canvas_act { "compositionId":"c_…", "batch":[
+canvas-act { "compositionId":"c_…", "batch":[
   { "action":"frame.create", "args":{ "name":"Worker", "x":0, "y":80, "w":200, "h":110, "fill":"#141a24" } },
   { "action":"canvas.create-node", "args":{ "type":"text", "name":"wl", "text":"CF Worker", "x":14, "y":12, "size":14, "fontWeight":700, "fill":"#e8edf5", "parentId":"<WorkerFrameId>" } },
   { "action": "arrow.create", "args": { "from":"Worker", "to":"HomeDO", "routing":"elbow", "label":"rpc" } }
@@ -119,7 +120,7 @@ Rules: one box per service (not per file), label every arrow with the call/proto
 **Layout:** each entity is a `frame` with a bold title row + a `text` node per field (stack fields at `y += 20`). Relationships are lines between frames with a **cardinality label** (`1`, `N`, `1..*`) near each end.
 
 ```jsonc
-clearly_canvas_act { "compositionId":"c_…", "batch":[
+canvas-act { "compositionId":"c_…", "batch":[
   { "action":"frame.create", "args":{ "name":"User", "x":0, "y":0, "w":180, "h":120, "fill":"#141a24" } },
   { "action":"canvas.create-node", "args":{ "type":"text", "name":"u-h", "text":"User", "x":12, "y":10, "size":15, "fontWeight":700, "fill":"#fff", "parentId":"<UserFrameId>" } },
   { "action":"canvas.create-node", "args":{ "type":"text", "name":"u-f1", "text":"id  PK", "x":12, "y":40, "size":13, "fontWeight":400, "fill":"#aab3c2", "parentId":"<UserFrameId>" } },
@@ -139,7 +140,7 @@ Rules: PK/FK noted in the field text, one relationship line per FK, cardinality 
 **Layout:** one central node (an `ellipse` or pill `rect`), child topics radiating out, each connected by a **curved** branch (a `<path>` inside a `type:"svg"`, not a straight line). Place children evenly around the center; second-level topics hang off their parent.
 
 ```jsonc
-clearly_canvas_act { "compositionId":"c_…", "batch":[
+canvas-act { "compositionId":"c_…", "batch":[
   { "action":"canvas.create-node", "args":{ "type":"ellipse", "name":"core", "x":220, "y":160, "w":160, "h":80, "fill":"#2a1f3a", "stroke":"#7b5cc4" } },
   { "action":"canvas.create-node", "args":{ "type":"text", "name":"coret", "text":"Company Brain", "x":250, "y":190, "size":15, "fontWeight":700, "fill":"#e9defb" } },
   { "action":"canvas.create-node", "args":{ "type":"rect", "name":"c1", "x":480, "y":60, "w":150, "h":48, "fill":"#1b2230", "stroke":"#3a465c", "radius":24 } },
@@ -156,7 +157,7 @@ Rules: keep the center visually heaviest, ~4–7 first-level branches (more → 
 Perfect for **"X vs Y vs Z"**. **Layout:** a grid of `rect` cells — top row = options, left column = criteria, body cells = the values. Tint the header row/column so the axes pop; fill body cells (green/amber/red) to make the winner obvious at a glance.
 
 ```jsonc
-clearly_canvas_act { "compositionId":"c_…", "batch":[
+canvas-act { "compositionId":"c_…", "batch":[
   { "action":"canvas.create-node", "args":{ "type":"rect", "name":"h-free", "x":160, "y":0, "w":120, "h":40, "fill":"#222b3a", "stroke":"#3a465c" } },
   { "action":"canvas.create-node", "args":{ "type":"text", "name":"h-freet", "text":"Free", "x":196, "y":12, "size":14, "fontWeight":700, "fill":"#fff" } },
   { "action":"canvas.create-node", "args":{ "type":"rect", "name":"h-pro", "x":280, "y":0, "w":120, "h":40, "fill":"#222b3a", "stroke":"#3a465c" } },
@@ -184,4 +185,4 @@ A clean diagram is **instantly screenshot-shareable** in a way a paragraph never
 - **Arrows = `arrow.create {from,to}`** — a first-class arrow that BINDS to the boxes and follows them (`routing:"elbow"` for flowcharts, `label` for edge text). Never hand-draw one as `type:"svg"` with a `marker-end`: that is a static path that does not move with its nodes; always pass `compositionId`; `name` on every create.
 - **Grid or it's a dump:** equal gutters, aligned edges, one read direction, generous whitespace.
 - **Perceive first** (design with `backgroundColor`, place in `gaze`); **re-perceive after** to read the human's ink and revise.
-- **Need an action not in clearly-canvas?** `clearly_canvas_catalog { surface:"all" }` — don't invent action names.
+- **Need an action not in clearly-canvas?** `canvas-catalog { surface:"all" }` — don't invent action names.

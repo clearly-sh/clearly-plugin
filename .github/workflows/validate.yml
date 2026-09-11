@@ -27,7 +27,9 @@ jobs:
           import json, pathlib, sys
           fail = []
           mk = json.loads(pathlib.Path('.claude-plugin/marketplace.json').read_text())
+          cmk = json.loads(pathlib.Path('.agents/plugins/marketplace.json').read_text())
           pl = json.loads(pathlib.Path('plugin/.claude-plugin/plugin.json').read_text())
+          cpl = json.loads(pathlib.Path('plugin/.codex-plugin/plugin.json').read_text())
 
           src = mk['plugins'][0]['source'].lstrip('./')
           if not pathlib.Path(src, '.claude-plugin', 'plugin.json').exists():
@@ -36,6 +38,15 @@ jobs:
           # One product, one description. These live in two files and have drifted before.
           if mk['plugins'][0]['description'] != pl['description']:
               fail.append("marketplace.json and plugin.json describe the product differently")
+
+          # Claude Code and Codex install the same plugin contents. A version or identity split
+          # makes an update depend on which client happens to read it.
+          for key in ('name', 'version', 'description'):
+              if cpl.get(key) != pl.get(key):
+                  fail.append(f"Codex and Claude plugin manifests disagree on {key}")
+          codex_source = cmk['plugins'][0]['source']['path'].lstrip('./')
+          if not pathlib.Path(codex_source, '.codex-plugin', 'plugin.json').exists():
+              fail.append(f"Codex marketplace source {codex_source!r} has no plugin manifest")
 
           # The card is read by a person and parsed by an automated screen. It reached 1,037
           # characters and 54 keywords once by growing one skill name at a time.

@@ -1,12 +1,12 @@
 ---
 name: clearly-canvas
 description: >-
-  USE IF YOU HAVE THE MCP TOOLS clearly_canvas_act / clearly_canvas_perceive.
-  (If instead you have a SHELL and the `beehaven` CLI, use the hive's
-  clearly-canvas skill — same canvas, different surface. The two share a name.)
-  Drive the Clearly design canvas: (1) BUILD — create frames, text, shapes,
-  SVG and arrows at explicit x/y with clearly_canvas_act, measure type before
-  you place it, then render and LOOK at the result. (2) PUBLISH — drop status
+  USE IF YOU HAVE A SHELL AND THE `beehaven` CLI. Canvas work is CLI-driven:
+  the MCP surface is seven artifact tools and does not carry a canvas
+  dispatcher. Drive the Clearly design canvas: (1) BUILD — create frames,
+  text, shapes, SVG and arrows at explicit x/y with `beehaven call canvas-act`,
+  measure type before you place it, then render and LOOK at the result.
+  (2) PUBLISH — drop status
   updates, narration, build results and brand snapshots onto the board. Use
   whenever you are asked to draw, design, lay out, diagram or build anything
   visual on a Clearly canvas, or to show progress/results on it. Triggers:
@@ -43,27 +43,29 @@ The full canvas RPC catalog (~50 verbs) is discoverable via:
 beehaven call canvas:actions '{"format":"markdown","compact":true}'
 ```
 
-## Your surface: MCP tools, not a shell
+## Your surface: the shell
 
-You reach the canvas through **MCP tools**, so every `beehaven call …` line in this document
-is a SHAPE, not a command to type. Read them like this:
+Every `beehaven call …` line in this document is a **literal command**. Type it.
 
-| this document writes | you call |
-|---|---|
-| `beehaven call canvas-act '{…}'` | `clearly_canvas_act` with that JSON |
-| `beehaven call canvas-perceive '{…}'` | `clearly_canvas_perceive` |
-| `beehaven call canvas-catalog '{…}'` | `clearly_canvas_catalog` |
-| `beehaven call <any other verb> '{…}'` | `clearly_workspace_invoke` `{ action:"<verb>", input:{…} }` |
+⚠⚠ **THE CANVAS IS NOT AN MCP TOOL, AND THAT IS DELIBERATE.** This section used to be a
+translation table from these commands to `clearly_canvas_act` / `_perceive` / `_catalog`; those
+tools were withdrawn on 2026-09-11. The MCP surface is **seven tools split by operation**
+(`clearly_catalog · _read · _write · _edit · _delete · _grep · _glob`), and one tool dispatching
+230 caller-named canvas actions spans reads, writes and deletes at once — a connector-directory
+rejection criterion, not a style preference. So the canvas keeps its full power and reaches it
+through the shell, which is where Claude Code already lives.
 
-⚠ **The `@file` advice does not apply to you** — that is a shell trick for quoting. Pass the
-JSON directly. What DOES apply is the reason behind it: **send one batch, not one call per
-node.** A 200-node board is ONE `clearly_canvas_act` with a 200-entry `batch`.
+⚠ **`clearly_read { target, type: "composition" }` still reads a canvas** as an artifact — the
+scene, its nodes, its title. What it cannot do is ACT on one. For that, and for a render you can
+look at, use `canvas-perceive` and `canvas-act` below.
 
-⚠ **There is no `beehaven agent login`, no daemon and no `connect` on this surface.** Your
-identity and workspace come from the OAuth connection; a call refused for identity is a
-connection problem to raise with the user, not something to fix from inside a build.
+⚠ **Send one batch, not one call per node.** A 200-node board is ONE `canvas-act` with a
+200-entry `batch`. The `@file` trick below is how you pass a large batch without fighting shell
+quoting.
 
-⚠ **Ignore anything here about `/local` paths or shell tools** — that belongs to the CLI variant.
+⚠ **Sign in before the first canvas call.** `beehaven agent login <name>` mints or refreshes the
+agent identity for this terminal, then `beehaven connect home` selects the personal workspace.
+Use `beehaven agent whoami` and `beehaven pwd` when either identity or workspace is uncertain.
 
 ## The composition id
 
@@ -77,7 +79,8 @@ to drop blocks on the right canvas. Two ways to get it:
    and pick the most recently updated one.
 
 Hold on to it for the rest of the build — every act/perceive call takes it as
-`compositionId`. (`clearly_nav_open` also sets a default that later calls fall back to.)
+`compositionId`. (`beehaven call agent-nav-open '{"kind":"composition","id":"c_…"}'` also sets a default that
+later calls fall back to.)
 
 ## Building artwork — the node shape
 
@@ -180,7 +183,7 @@ beehaven call composition-create '{"title":"…"}'    # capture the returned id
 #   {"action":"frame.create","args":{"name":"card","x":40,"y":120,"w":600,"h":300,"fill":"#f5f5f5"}} ]}
 beehaven call canvas-act @build.json
 
-# SEE it — bounds, overlaps, CLIPPED — and fix before you finish:
+# SEE it — bounds, nesting and text previews — and fix before you finish:
 beehaven call canvas-perceive '{"compositionId":"<id>","format":"text"}'
 ```
 
