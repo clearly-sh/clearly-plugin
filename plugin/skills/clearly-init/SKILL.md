@@ -42,12 +42,18 @@ The sign-in grants scoped access (`rpc:read` for search + read; add `rpc:write` 
 
 ### 2. Verify
 
-Run `/mcp` in Claude Code. You should see `clearly` listed (as **Authenticated**) with ~48 tools. The ones that matter most:
+Run `/mcp` in Claude Code. You should see `clearly` listed (as **Authenticated**) with **18 tools**. The ones that matter most:
 
-- **Company brain** — `clearly_context_search` (one ranked search across prompts, docs, decisions + facts; `scope:"org"` federates across the org), `clearly_context_write` (write a doc/PRD/decision back in), `clearly_context_map` (orient).
-- **Skills** — `clearly_skill_list` / `clearly_skill_get` (discover + load this workspace's procedures).
-- **Catch-all** — `clearly_workspace_catalog` (list all ~200 actions), `clearly_workspace_invoke` (run any by name), `clearly_workspace_ask` (talk to the Omni agent).
-- **Discovery** (no auth) — search public projects, ask a public agent, capture a lead.
+- **The workspace as a filesystem** — `clearly_bash`, `clearly_grep`, `clearly_glob`, `clearly_read`, `clearly_edit`, `clearly_write`, `clearly_delete`. Folders are projects, documents are `.md`, canvases are `.scene.json`.
+- **Company brain** — `clearly_context_search` (one ranked search across prompts, docs, decisions + facts; `scope:"org"` federates across the org). `context-write` and `context-map` are ACTIONS, reached with `clearly_workspace_invoke { action: "context-write" }`.
+- **Catch-all** — `clearly_workspace_catalog` (browse ~1,000 actions), `clearly_workspace_invoke` (run any by name), `clearly_describe_action` (ask what one takes).
+- **Canvas** — `clearly_canvas_perceive` / `_act` / `_catalog`.
+- **Start here** — `clearly_guide`, one call, explains the rest.
+
+> ⚠ **Everything requires authentication.** There is no anonymous surface: as of 2026-09-11 both
+> `tools/list` and `tools/call` resolve a credential first, and every credential is bound to an
+> agent. A 401 carries an OAuth challenge, so a capable client can recover from it by itself —
+> but a caller with no token sees no catalog, by design.
 
 Then load the usage skill: it teaches the Company Brain + self-prompting loops — see `clearly-workflows`.
 
