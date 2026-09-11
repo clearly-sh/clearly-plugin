@@ -1,37 +1,81 @@
-# clearly-plugin
+# Clearly for Claude Code
 
-The official [Claude Code](https://claude.com/claude-code) plugin for **Clearly** — your company brain + spatial canvas over MCP.
+[![validate](https://github.com/clearly-sh/clearly-plugin/actions/workflows/validate.yml/badge.svg)](https://github.com/clearly-sh/clearly-plugin/actions/workflows/validate.yml)
+[![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![MCP](https://img.shields.io/badge/MCP-2025--06--18-6E56CF.svg)](https://clearly.sh/docs/mcp)
 
-It bundles a pre-configured MCP server (`relay.clearly.sh/mcp`, plus a `clearly-staging` connector) with eight skills:
-- **`clearly-init`** — setup: sign in over OAuth (browser), verify `/mcp`.
-- **`clearly-workflows`** — company-brain usage: search → write back → schedule.
-- **`clearly-canvas`** — the canvas operating manual: perceive → create frames / text / shapes / vector arrows / diffs that persist headlessly.
-- **`pair-on-canvas`** — the board as mission control for a coding task: read the human's pinned spec, do the repo work, report plan / status / diff / PR as cards.
-- **`ship-review`** — land a code change as a spatial change-map; the human inks notes, you read them back and revise.
-- **`visualize`** — turn any concept or answer into a diagram.
-- **`codebase-map`** — walk a repo → a living architecture map.
-- **`sticker-pack`** — an idea → a printable die-cut sticker sheet.
+Your workspace — documents, projects, tickets and a spatial canvas — addressed by your agent as a
+filesystem. Every change is versioned and revertable, and `document-status` tells the agent what
+**the human** changed since it last looked, so it re-reads instead of answering from a stale body.
+
+<img src="./docs/what-it-is.svg" alt="Your agent connects over MCP to a Clearly workspace: documents, projects and tickets addressed as a filesystem, plus a spatial canvas. Your team sees the same workspace live." width="880">
 
 ## Install
 
 ```
 /plugin marketplace add clearly-sh/clearly-plugin
 /plugin install clearly@clearly
-/clearly:init
+/clearly:clearly-init
 ```
 
-Auth is **OAuth** — run `/mcp`, pick `clearly`, choose **Authenticate**, and sign in through the browser. No token to mint or paste. Sign out / revoke anytime with `claude mcp logout clearly` (or Settings → **Developers** in the app).
+Authentication is **OAuth** — run `/mcp`, pick `clearly`, choose **Authenticate**. The browser
+does the rest; there is no token to mint or paste. You'll be asked **which workspace** and **which
+agent**, because every credential belongs to a named agent — that is what makes the activity log
+say *who* did something rather than only *what happened*.
 
-## Don't use Claude Code?
+Grant `rpc:write` unless you want the workspace read-only.
 
-The MCP server is hosted — any MCP client connects with just the endpoint (OAuth-capable clients prompt a browser sign-in), no plugin:
+## Any other MCP client
+
+The server is hosted. An OAuth-capable client needs only the endpoint:
 
 ```json
 { "mcpServers": { "clearly": { "url": "https://relay.clearly.sh/mcp" } } }
 ```
 
-See [`plugin/README.md`](./plugin/README.md) for the full tool surface, per-client setup, and scopes.
+Working in more than one workspace? A client stores one credential per server entry, so add a
+second at `https://relay.clearly.sh/mcp/w/<workspaceId>`.
+
+> **There is no anonymous access.** `tools/list` and `tools/call` both require a credential and
+> answer `401` without one — carrying a `WWW-Authenticate` challenge, so a capable client starts
+> the sign-in flow by itself. See [SECURITY.md](./SECURITY.md).
+
+## The tool surface — 18
+
+| | |
+|---|---|
+| **Shell** | `bash` `grep` `glob` `read` `edit` `write` `delete` — folders are projects, documents are `.md`, canvases are `.scene.json` |
+| **Dispatch** | `workspace_catalog` `workspace_invoke` `describe_action` `batch` — roughly a thousand further actions by name |
+| **Canvas** | `canvas_perceive` `canvas_act` `canvas_catalog` |
+| **Semantic** | `context_search` `thought_search` `thought_record` |
+| **Start here** | `guide` — one call, explains the rest |
+
+Names are prefixed `clearly_`. Full reference: [`plugin/README.md`](./plugin/README.md) ·
+[setup](./plugin/SETUP.md) · [docs](https://clearly.sh/docs/mcp).
+
+## The 14 skills
+
+Each is a slash command the moment the plugin installs.
+
+**Working in the workspace** — `clearly-init` (connect and verify) · `clearly-workspace` ·
+`clearly-docs` · `clearly-workflows` (search → write back, so context compounds) · `clearly-agent`
+
+**On the canvas** — `clearly-canvas` (the operating manual) · `pair-on-canvas` (the board as
+mission control for a coding task) · `ship-review` (land a change as a spatial change-map the
+human inks back) · `visualize` · `codebase-map`
+
+**Design craft** — `design-craft` (grid construction, modular type scale, colour systems, optical
+correction, a verify-before-done pass) · `brand-identity` (brief → mark → lockups → palette →
+spec board) · `layout-systems` (poster, deck, landing page, editorial, social — with the real
+numbers per format) · `sticker-pack`
+
+## Repositories
+
+| | |
+|---|---|
+| **clearly-sh/clearly-plugin** | this one — the plugin, its skills, and the marketplace manifest |
+| [clearly-sh/clearly](https://github.com/clearly-sh/clearly) | issues, release notes and security reports for the MCP server and the `beehaven` CLI |
 
 ## License
 
-MIT © Clearly
+MIT © [Clearly](https://clearly.sh)

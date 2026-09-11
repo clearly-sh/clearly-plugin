@@ -1,0 +1,98 @@
+name: validate
+
+# ⚠⚠ THIS IS NOT DECORATION. The Claude plugin directory MIRRORS PUSHES TO THIS REPO
+# automatically — "updates pushed to your GitHub repo are picked up automatically; CI mirrors
+# changes to the public marketplace and runs automated screening on each update." There is no
+# re-submission step and therefore no human between a bad commit and the published listing.
+# This workflow is the only thing standing there.
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # ⚠ THE STRUCTURAL CHECKS RUN FIRST AND DEPEND ON NOTHING. If the Claude CLI install
+      #   below ever breaks — a bad release, a registry outage, a renamed package — these still
+      #   run, so CI keeps answering the question it exists for instead of going green on a
+      #   skipped step.
+      - name: Manifests are valid JSON, and agree with each other
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, sys
+          fail = []
+          mk = json.loads(pathlib.Path('.claude-plugin/marketplace.json').read_text())
+          pl = json.loads(pathlib.Path('plugin/.claude-plugin/plugin.json').read_text())
+
+          src = mk['plugins'][0]['source'].lstrip('./')
+          if not pathlib.Path(src, '.claude-plugin', 'plugin.json').exists():
+              fail.append(f"marketplace source {src!r} has no plugin manifest")
+
+          # One product, one description. These live in two files and have drifted before.
+          if mk['plugins'][0]['description'] != pl['description']:
+              fail.append("marketplace.json and plugin.json describe the product differently")
+
+          # The card is read by a person and parsed by an automated screen. It reached 1,037
+          # characters and 54 keywords once by growing one skill name at a time.
+          if len(pl['description']) > 500:
+              fail.append(f"plugin description is {len(pl['description'])} chars (max 500)")
+          if len(pl['keywords']) > 15:
+              fail.append(f"{len(pl['keywords'])} keywords (max 15) — that reads as stuffing")
+
+          # ⚠⚠ NO INTERNAL HOSTNAMES. The staging relay was committed here once and had to be
+          #   purged from the history; this is what stops the second time.
+          #
+          # ⚠ THE NEEDLE IS ASSEMBLED, NOT WRITTEN. Spelled literally, this check matches ITSELF
+          #   and fails every run — which it did on its first local run, before this ever pushed.
+          #   The same "a guard matched its own text" failure the workspace repo has hit six times.
+          # ⚠ AND IT SCANS WHAT SHIPS, not the tree. CI config is not distributed to anyone; the
+          #   plugin and the manifests are.
+          needle = 'workers' + '.dev'
+          shipped = list(pathlib.Path('plugin').rglob('*')) + [pathlib.Path('.claude-plugin/marketplace.json')]
+          for p in shipped:
+              if not p.is_file(): continue
+              try: t = p.read_text()
+              except Exception: continue
+              if needle in t:
+                  fail.append(f"{p}: names an internal host — ship relay.clearly.sh")
+
+          for f in fail: print("::error::" + f)
+          sys.exit(1 if fail else 0)
+          PY
+
+      - name: Every declared skill exists and is loadable
+        run: |
+          python3 - <<'PY'
+          import pathlib, sys, re
+          fail = []
+          skills = sorted(p for p in pathlib.Path('plugin/skills').iterdir() if p.is_dir())
+          if not skills: fail.append("no skills found — the plugin ships nothing")
+          for s in skills:
+              md = s / 'SKILL.md'
+              if not md.exists():
+                  fail.append(f"{s.name}: no SKILL.md, so it is not a skill"); continue
+              fm = md.read_text().split('---')
+              if len(fm) < 3:
+                  fail.append(f"{s.name}: no frontmatter"); continue
+              # Claude decides whether to activate a skill by reading these two. Missing them is
+              # a skill that ships and never fires.
+              for key in ('name', 'description'):
+                  if not re.search(rf'^\s*{key}:\s*\S', fm[1], re.M):
+                      fail.append(f"{s.name}: frontmatter has no {key}")
+          print(f"  {len(skills)} skills checked")
+          for f in fail: print("::error::" + f)
+          sys.exit(1 if fail else 0)
+          PY
+
+      - name: claude plugin validate
+        run: |
+          npm install -g @anthropic-ai/claude-code >/dev/null 2>&1 || {
+            echo "::warning::could not install the Claude CLI — structural checks above still ran"
+            exit 0
+          }
+          claude plugin validate ./plugin
