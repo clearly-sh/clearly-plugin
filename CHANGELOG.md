@@ -4,6 +4,23 @@ Notable changes to the plugin and the MCP surface it connects to.
 The surface is versioned separately from this repo — `initialize` reports it as
 `serverInfo.version`.
 
+## 0.8.1 — 2026-09-16
+
+### MCP surface 1.1
+
+- Added the finalized `2026-07-28` stateless protocol era: `server/discover`, per-request protocol
+  metadata, required HTTP dispatch-header validation, cache hints, result discriminators, and
+  per-response server identity. Legacy initialize clients remain supported.
+- Added feature-gated discovery boundaries for Avatar Soul, Doodle Space, and Agent Home so a
+  disabled feature is neither advertised nor callable.
+
+### Plugin
+
+- Added `agent-doodle-space` and `agent-home` skills.
+- Unbundled `ship-review` while it remains in feature development. `pair-on-canvas` now uses the
+  native `canvas.add-diff` block directly, so the published workflow has no missing dependency.
+- Refreshed the agent and canvas operating guidance from the monorepo source of truth.
+
 ## 0.8.0 — 2026-09-11
 
 ### MCP surface 1.0

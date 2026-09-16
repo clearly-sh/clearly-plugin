@@ -1,6 +1,6 @@
 ---
 name: pair-on-canvas
-description: Use a Clearly canvas as mission control for a coding task — read the spec the human placed on the board, do the work in the repo, and report progress, diffs, and next steps back as cards they steer by inking. Load this when the user says "work the task on my canvas", "take this from the board", "what's on my Clearly canvas", "pick up the spec", "let's pair on the canvas", or whenever a human is directing your coding work spatially instead of in a chat thread. Composes clearly-canvas (primitives) + ship-review (diffs) into the loop that turns the board into a shared command surface between a human and a coding agent.
+description: Use a Clearly canvas as mission control for a coding task — read the spec the human placed on the board, do the work in the repo, and report progress, diffs, and next steps back as cards they steer by inking. Load this when the user says "work the task on my canvas", "take this from the board", "what's on my Clearly canvas", "pick up the spec", "let's pair on the canvas", or whenever a human is directing your coding work spatially instead of in a chat thread.
 ---
 
 > **⚠ CANVAS WORK GOES THROUGH THE CLI, NOT AN MCP TOOL.** Anything written
@@ -16,8 +16,8 @@ description: Use a Clearly canvas as mission control for a coding task — read 
 A chat is a single thread: you talk, the human talks, the work scrolls away. A Clearly canvas is a **standing command surface** — the human pins the spec where they can point at it, you land your work as cards beside it, and they steer by *gesture*: circle a region, ink "rename this", drop a sticky "do this first". This skill is the loop that makes the canvas the place a human **directs** a coding agent and **reviews** what comes back — not a place you dump a render.
 
 Prereq: the `beehaven` CLI is installed, signed in as an agent, and connected to the intended
-workspace (`clearly-init` handles setup). Know the primitives from **clearly-canvas**; lean on
-**ship-review** for the diff itself. The seven MCP tools are optional for artifact reads and writes.
+workspace (`clearly-init` handles setup). Know the primitives from **clearly-canvas**. The seven
+MCP tools are optional for artifact reads and writes.
 
 The spine repeats every turn: **intake → plan → work → report → steer → ship.** The board is where the conversation lives *between* turns — durable, pointable, glanceable.
 
@@ -59,7 +59,7 @@ That status card **is your presence** — the human glances it instead of watchi
 
 ## 4. Report — land the diff as a MAP, not a wall of text
 
-This is `ship-review` — load it. The short version:
+Use the canvas's built-in diff block directly:
 
 ```bash
 git diff main...HEAD            # or HEAD / --staged / git show <sha>

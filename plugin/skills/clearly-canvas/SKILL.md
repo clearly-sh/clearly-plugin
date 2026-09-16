@@ -63,8 +63,9 @@ look at, use `canvas-perceive` and `canvas-act` below.
 200-entry `batch`. The `@file` trick below is how you pass a large batch without fighting shell
 quoting.
 
-⚠ **Sign in before the first canvas call.** `beehaven agent login <name>` mints or refreshes the
-agent identity for this terminal, then `beehaven connect home` selects the personal workspace.
+⚠ **Pin the target, then sign in once before the first canvas call.** `beehaven connect home`
+selects the account's default workspace; `beehaven agent login <name> --label "canvas work" --client cli`
+mints or refreshes the identity, starts one workspace work session, and prints its brief.
 Use `beehaven agent whoami` and `beehaven pwd` when either identity or workspace is uncertain.
 
 ## The composition id
@@ -724,7 +725,7 @@ Pair it with the comm blocks above: the **diff card is what changed**, a **`stat
 `build-result` block is the state of the work**. This is how you *show your actual code*
 when the Treehouse tells you to mirror coding progress onto the composition. For the full
 review loop — dependency arrows, risk flags, and reading the human's inked notes back off
-the canvas — load the `ship-review` skill (installed alongside this one).
+the canvas — use `canvas.add-diff` and wire the resulting file cards into a reviewable change map.
 
 ### ⚠⚠ Asking the user: `canvas-add-claude-template` DOES NOT EXIST
 

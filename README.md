@@ -2,7 +2,7 @@
 
 [![validate](https://github.com/clearly-sh/clearly-plugin/actions/workflows/validate.yml/badge.svg)](https://github.com/clearly-sh/clearly-plugin/actions/workflows/validate.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![MCP](https://img.shields.io/badge/MCP-2025--06--18-6E56CF.svg)](https://clearly.sh/docs/mcp)
+[![MCP](https://img.shields.io/badge/MCP-2026--07--28-6E56CF.svg)](https://clearly.sh/docs/mcp)
 
 Your workspace — documents, canvases, sheets, decks, projects, boards and tickets — available to
 your coding agent through seven typed MCP tools, with deeper workspace and canvas operations via
@@ -34,7 +34,7 @@ codex plugin add clearly@clearly
 codex mcp login clearly
 ```
 
-Restart Codex after installing or upgrading so it reloads the plugin's MCP definition and all 14
+Restart Codex after installing or upgrading so it reloads the plugin's MCP definition and all 15
 skills. For a non-browser agent identity, use `beehaven agent login <name>` followed by
 `beehaven mcp install --client codex`; the installer binds the credential to that active identity
 and does not print the raw token.
@@ -68,7 +68,7 @@ precise nested schema. Catalog is scoped by artifact type and operation, not req
 read. Full reference: [`plugin/README.md`](./plugin/README.md) · [setup](./plugin/SETUP.md) ·
 [docs](https://clearly.sh/docs/mcp).
 
-## The 14 skills
+## The 15 skills
 
 Each is a slash command the moment the plugin installs.
 
@@ -76,8 +76,10 @@ Each is a slash command the moment the plugin installs.
 `clearly-docs` · `clearly-workflows` (search → write back, so context compounds) · `clearly-agent`
 
 **On the canvas** — `clearly-canvas` (the operating manual) · `pair-on-canvas` (the board as
-mission control for a coding task) · `ship-review` (land a change as a spatial change-map the
-human inks back) · `visualize` · `codebase-map`
+mission control for a coding task) · `visualize` · `codebase-map`
+
+**Agent identity** — `agent-doodle-space` (read and update Avatar Soul; draw durable companion
+expressions) · `agent-home` (arrange the agent-owned memory apartment on its fixed grid)
 
 **Design craft** — `design-craft` (grid construction, modular type scale, colour systems, optical
 correction, a verify-before-done pass) · `brand-identity` (brief → mark → lockups → palette →
