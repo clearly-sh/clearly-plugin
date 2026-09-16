@@ -5,14 +5,25 @@ description: Work in a Clearly workspace AS an agent — sign in with an identit
 
 # clearly-agent — who you are, and what that makes your work
 
-## Sign in first. Nothing else works.
+## Select the workspace, then sign in once
 
 ```bash
-beehaven agent login <name>     # mints the identity if it does not exist
+beehaven env
+beehaven connect home
+beehaven agent login <name> --label "what I am here to do" --client cli
 ```
 
-⚠⚠ **EVERY VERB IS REFUSED WITHOUT ONE**, except a short bootstrap list (`login`, `status`,
-`pwd`, `env`, `doctor`, `agent`). The refusal names the fix, but it arrives on your first real
+## Personal workspace means a private layer, not another DO
+
+Every human and every agent in the selected workspace has a **personal workspace layer**: its own
+drafts, recents, sessions, and memory. `home` chooses the account's default workspace container;
+the identity selected by `agent login` chooses whose personal layer is active inside it. An agent
+does not receive a second workspace Durable Object. Its unfiled work is private, and filing it into
+a project is the explicit sharing act.
+
+⚠⚠ **EVERY REMOTE WORKSPACE VERB IS REFUSED WITHOUT ONE.** Local bootstrap/navigation verbs
+(`login`, `status`, `pwd`, `env`, `doctor`, `agent`, `connect`) remain available so the target can
+be pinned before the workspace session starts. The refusal names the fix, but it arrives on your first real
 call — so log in before you start, not after something fails.
 
 ⚠ **There is no opt-out.** `BEEHAVEN_NO_AGENT_SESSION` was deleted: a documented one-line bypass
@@ -44,14 +55,32 @@ different workspaces at once. What is NOT concurrent: one daemon, one relay, one
   sweep existed one workspace had **128 "active" sessions and 2 ended**; a status field nothing
   maintains is worse than no field.
 
-## Read your brief — do this at the start of every session
+## Your brief is included in login
 
 ```bash
-beehaven call agent-login '{"label":"what I am here to do","client":"cli"}'   # session + brief
-beehaven call agent-brief '{}'                                                # brief, standalone
+beehaven agent login <name> --label "what I am here to do" --client cli  # identity + ONE session + brief
+beehaven call agent-brief '{}'                                           # re-read it without starting a session
 ```
 
-It carries: prior **sessions**, **lastActions**, **focus**, **assignedToMe**, **awaitingApproval**,
+When the staging deployment has `AGENT_SOUL_SPACE=1`, the login confirmation also announces the
+agent's Avatar Soul: a first-person identity description, what it looks like, and a minted baseline
+SVG. The same message names `agent-soul-get`, `agent-soul-avatar-update`, `agent-doodle-space-get`,
+and `agent-doodle-space-draw`; pre-mint authoring is `agent-soul-draft-get` / `agent-soul-draft-save`.
+When the soul lane is enabled, it also advertises the persistent Agent Home actions
+`agent-home-get`, `agent-home-layout`, `agent-home-memory`, `agent-home-journal`,
+`agent-home-ad`, and `agent-home-avatar-location`; read the `agent-home` skill before arranging
+the 24px apartment grid.
+Read the `agent-doodle-space` skill before using those actions. They are an opt-in identity/drawing
+lane and do not replace or modify the existing avatar/avatar-shop system. A Doodle Space belongs to
+the admitted agent in the workspace, and soul reads/updates report whether the desktop companion is
+wearing the drawing or a preset. If the capability line is absent, it is disabled for that
+deployment; the existing companion and presets remain available.
+
+⚠ **Do not call `agent-login` immediately after `beehaven agent login`.** The RPC is an alias of
+`agent-session-start`; doing both creates two sessions. Call it directly only when deliberately starting
+or resuming an additional workspace session.
+
+The brief carries: prior **sessions**, **lastActions**, **focus**, **assignedToMe**, **awaitingApproval**,
 **memories**, **recents** (what you touched, with titles and whether you made or opened it), and
 **drafts** (your own unfiled work) — plus the workspace half: what changed since you were last
 here **and by whom**, inbox, notifications, messages, other agents.

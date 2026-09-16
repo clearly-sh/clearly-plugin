@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "clearly",
-      "description": "Bring Clearly into your coding agent: seven typed MCP tools for documents, canvases, sheets, decks, projects, boards and tickets, plus CLI-driven workspace actions and studio-grade canvas and design skills.",
+      "description": "Bring Clearly into your coding agent: seven typed MCP tools for documents, canvases, sheets, decks, projects, boards and tickets, plus CLI-driven workspace actions, Avatar Soul, and studio-grade canvas and design skills.",
       "category": "productivity",
       "source": "./plugin",
       "homepage": "https://clearly.sh"

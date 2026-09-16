@@ -125,7 +125,7 @@ Good map answers three questions instantly: *what are the big pieces, how do the
 
 ## 5. Keep it live
 
-This isn't a one-shot render — it's a living diagram. After the repo changes, re-run §1 and `canvas.update-nodes` the frames whose LOC/coupling shifted (resize, recolor, re-arrow) instead of redrawing — the map stays current as the codebase moves. Pairs naturally with **`ship-review`** (the per-change diff map lands *next to* the architecture map) and **`beehaven watch git`** (re-tune the map as commits land — ⚠ CLI-only; on MCP, re-run §1 when you know the repo moved).
+This isn't a one-shot render — it's a living diagram. After the repo changes, re-run §1 and `canvas.update-nodes` the frames whose LOC/coupling shifted (resize, recolor, re-arrow) instead of redrawing — the map stays current as the codebase moves. A `canvas.add-diff` block can land the current change next to the architecture map, and **`beehaven watch git`** can re-tune the map as commits land (⚠ CLI-only; on MCP, re-run §1 when you know the repo moved).
 
 ## The viral bit
 

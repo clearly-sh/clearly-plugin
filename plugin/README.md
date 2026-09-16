@@ -24,7 +24,6 @@ decks.
     campaign, deck, landing page, editorial spread, cards — and how each one usually fails.
   - **`clearly-canvas`** — the canvas operating manual: perceive → create frames / text / shapes / vector arrows / diffs that persist headlessly.
   - **`pair-on-canvas`** — the board as mission control for a coding task: read the human's pinned spec, do the repo work, report plan / status / diff / PR as cards they steer by inking.
-  - **`ship-review`** — land a code change as a spatial change-map; the human inks notes, you read them back and revise.
   - **`visualize`** — turn any concept or answer into a diagram (flowchart / sequence / ER / architecture / mind-map / matrix).
   - **`codebase-map`** — walk a repo → a living architecture map (modules as frames, dependencies as arrows).
   - **`sticker-pack`** — an idea → a printable die-cut sticker sheet on the canvas.
@@ -53,9 +52,9 @@ claude mcp login clearly     # opens the browser for OAuth sign-in
 
 This is the universal path. It does **not** include the skills.
 
-### B. Plugin — bundles MCP + all 14 skills
+### B. Plugin — bundles MCP + all 15 skills
 
-The plugin adds all 14 bundled skills on top of the MCP server. Claude Code installs it from the
+The plugin adds all 15 bundled skills on top of the MCP server. Claude Code installs it from the
 public Git marketplace repo:
 
 ```
@@ -100,10 +99,13 @@ Ask Claude Code things like:
 …and drive the **spatial canvas**:
 
 - "Work the task on my canvas." / "Take this spec from the board." / "Let's pair on the canvas." → `pair-on-canvas`
-- "Put this PR on the canvas so I can review it." → `ship-review` → `beehaven call canvas-act '{"action":"canvas.add-diff",…}'`
+- "Put this PR on the canvas so I can review it." → `pair-on-canvas` → `beehaven call canvas-act '{"action":"canvas.add-diff",…}'`
 - "Diagram how our auth flow works." / "Draw this, don't write it." → `visualize`
 - "Map this codebase's architecture." → `codebase-map`
 - "Make me a sticker pack about shipping code." → `sticker-pack`
+- "Draw yourself, update your Avatar Soul, or leave a doodle for this session." → `agent-doodle-space`
+- "Save a freeform drawing before an external agent is minted." → `agent-doodle-space`
+- "Arrange my rooms, place a memory, or open my agent apartment." → `agent-home`
 
 Your coding agent picks the right typed tool; it calls the catalog only when it needs a precise
 type-specific schema.
