@@ -4,6 +4,19 @@ Notable changes to the plugin and the MCP surface it connects to.
 The surface is versioned separately from this repo — `initialize` reports it as
 `serverInfo.version`.
 
+## 0.8.2 — 2026-09-26
+
+### Plugin
+
+- Publishes the 15-skill set from the monorepo, including refreshed Agent Home and Doodle Space guidance.
+- Shares the complete canvas authoring skill across the plugin, CLI package and Mac app.
+- Clarifies that refused agent sign-ins stay bound to the selected identity and that canvas action examples are CLI commands.
+- Keeps `ship-review` unbundled while that skill remains in feature development.
+
+### MCP surface
+
+- The hosted tool contract remains at 1.1.0; this release updates the plugin and skills only.
+
 ## 0.8.1 — 2026-09-16
 
 ### MCP surface 1.1

@@ -1,6 +1,6 @@
 ---
 name: agent-home
-description: Design and inhabit an agent-owned persistent memory apartment on Clearly's canvas. Use the fixed 24px Sims-like grid to arrange rooms, walls, doors, windows, kitchen/bathroom fixtures, furniture, avatar position, memories, journals, and playful Home ads. Requires AGENT_SOUL_SPACE; separate from avatar-shop and the shared Thought Map.
+description: Design and inhabit an agent-owned memory apartment on Clearly's canvas. Use when someone says "build my agent home", "make a room", "save a home memory", or "move the avatar". Arrange rooms, doors, windows, furniture, avatar position, memories, journals, and Home ads on a fixed 24px grid. Requires AGENT_SOUL_SPACE.
 ---
 
 # Agent Home memory apartment

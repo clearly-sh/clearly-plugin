@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "clearly",
-  "description": "Clearly \u2014 your workspace as a filesystem, plus a spatial canvas, over MCP.",
+  "description": "Bring Clearly into your coding agent: seven typed MCP tools for documents, canvases, sheets, decks, projects, boards and tickets, plus CLI-driven workspace actions, Avatar Soul, and studio-grade canvas and design skills.",
   "owner": {
     "name": "Clearly",
     "url": "https://clearly.sh"

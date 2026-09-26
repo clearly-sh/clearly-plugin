@@ -212,27 +212,33 @@ separate work that is *measured* from work that *looks* right.
 
 ## 7. THE STUDIO PASS — run this before you say it is done
 
-⚠⚠ **`canvas.audit` reads the DATA. It cannot see that the work is ugly.** Render and LOOK
-(`canvas-perceive {includePixels, fitNodeIds}`), then go through this list. On a real build,
-looking caught four defects that every automated check called clean.
+⚠⚠ **A check reads the DATA. It cannot see that the work is ugly.** Run
+`canvas.review {ids:[<artboard>]}` (or clearly-canvas's `review.mjs`). Its `verdict` and
+`craft` findings measure the boxes marked **✓** below. Then open the PNG it returns and
+judge the rest by eye. On a real build, looking caught four defects that every automated
+check called clean.
 
 ```
-□ MARGINS      Is anything closer to an edge than the margin, unintentionally?
+✓ MARGINS      Is anything closer to an edge than the margin, unintentionally?   (edge-crowding)
 □ MEASURE      Any line of body copy over ~75 characters?
-□ SIZES        Count distinct type sizes. More than 3–4? Collapse them.
+✓ SIZES        Count distinct type sizes. More than 3–4? Collapse them.          (type-sprawl flags >6 and near-duplicates; aim lower)
 □ TRACKING     Is display type still at default spacing? Tighten it.
-□ ALIGNMENT    Pick any element — what is it aligned to? If nothing, fix it.
+✓ ALIGNMENT    Pick any element — what is it aligned to? If nothing, fix it.     (near-miss-alignment catches 1–3px misses only)
 □ SPACE        Is between-group space ≥ 2× within-group space?
 □ FOCAL        Where does the eye land first? Is that the most important thing?
 □ GREYSCALE    Does the hierarchy survive with colour removed?
-□ CONTRAST     Body ≥ 4.5:1, display ≥ 3:1 — measured, not guessed.
-□ ACCENT       Exactly one? Under ~10% of the area?
+✓ CONTRAST     Body ≥ 4.5:1, display ≥ 3:1 — measured, not guessed.           (contrast; text-over-image means look)
+□ ACCENT       Exactly one? Under ~10% of the area?                            (palette-sprawl flags a scatter)
 □ ORPHANS      Any single word alone on the last line of a heading?
 □ CONSISTENCY  Same corner radius, same stroke weight, same gap, everywhere?
-□ EDGE         Zoom to 100%. Does anything touch, overlap or clip?
+✓ EDGE         Zoom to 100%. Does anything touch, overlap or clip?             (text-collision, text-covered, overflow)
 ```
 
-**If you change nothing after this pass, you did not really run it.** There is always one.
+A **✓** check that comes back clean only means the numbers passed. Still look at the pixels.
+
+A first draft almost always has something this pass should change, so if you changed nothing,
+run it again on the thumbnail. If it is still clean, say what you checked. Never make a change
+only to show that a review happened.
 
 ---
 

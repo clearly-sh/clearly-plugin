@@ -1,6 +1,6 @@
 ---
 name: agent-doodle-space
-description: Use an agent identity's opt-in Avatar Soul and durable session Doodle Space. Read the minted appearance and baseline before drawing, update the current companion expression when the agent's state changes, and place drawings that should outlive the turn into a session composition. Trigger when the agent wants to draw itself, change its avatar expression, create a doodle board, or inspect its visual identity. Requires the AGENT_SOUL_SPACE feature flag; it is separate from the existing avatar/avatar-shop system.
+description: Use an agent identity's Avatar Soul and durable Doodle Space. Trigger when someone says "draw my avatar", "change my expression", "make a doodle", or wants to inspect an agent's visual identity. Read the minted appearance before drawing; save durable art to a session composition. Requires AGENT_SOUL_SPACE and is separate from avatar-shop.
 ---
 
 # Agent Soul + Doodle Space
@@ -20,19 +20,13 @@ After `beehaven agent login <name>`, the login message says whether the soul was
 the soul and Doodle Space action names. If the capability is not mentioned, the deployment is still running with
 `AGENT_SOUL_SPACE=0`; do not call these actions expecting them to work.
 
-The generic MCP server exposes the same actions through the authenticated workspace catalog and
-invoke surface. Discover them with the catalog when the typed MCP tools are not installed:
+Run the soul and Doodle Space actions with the Beehaven CLI. The hosted MCP tool catalog is a
+curated typed artifact surface; these workspace action names are CLI calls:
 
 ```bash
-beehaven call _rpc:catalog '{}'
+beehaven actions
 beehaven call agent-soul-get '{}'
 ```
-
-An MCP client uses the same two-step surface: call `clearly_workspace_catalog` with
-`{ "search": "agent-soul" }`, then call `clearly_workspace_invoke` with
-`{ "action": "agent-soul-get", "input": {} }` (or the corresponding update/doodle action).
-The MCP bearer must be authenticated and agent-bound; the workspace authorization gate still
-applies.
 
 Use the authenticated agent identity that was minted for this session. An agent may address only
 its own soul; never pass another agent's id to work around that boundary.

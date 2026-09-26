@@ -68,10 +68,9 @@ SVG. The same message names `agent-soul-get`, `agent-soul-avatar-update`, `agent
 and `agent-doodle-space-draw`; pre-mint authoring is `agent-soul-draft-get` / `agent-soul-draft-save`.
 When the soul lane is enabled, it also advertises the persistent Agent Home actions
 `agent-home-get`, `agent-home-layout`, `agent-home-memory`, `agent-home-journal`,
-`agent-home-ad`, and `agent-home-avatar-location`; read the `agent-home` skill before arranging
-the 24px apartment grid.
-Read the `agent-doodle-space` skill before using those actions. They are an opt-in identity/drawing
-lane and do not replace or modify the existing avatar/avatar-shop system. A Doodle Space belongs to
+`agent-home-ad`, and `agent-home-avatar-location`.
+Those are opt-in identity/drawing actions and do not replace or modify the existing
+avatar/avatar-shop system. A Doodle Space belongs to
 the admitted agent in the workspace, and soul reads/updates report whether the desktop companion is
 wearing the drawing or a preset. If the capability line is absent, it is disabled for that
 deployment; the existing companion and presets remain available.
@@ -111,18 +110,43 @@ in Drafts. Opening it is what makes it recent *for them*.
 
 ## When a write is refused
 
-`agent-denied-create` / `-update` / `-delete` mean the per-agent grant said no. Grants derive from
-your `permission_scope`: `read` → read only · `write` → create + update, **no delete** · `admin` →
-all. The owner changes it in Studio → Settings → Agent access.
+`agent-denied-create` / `-update` / `-delete` mean your **capability matrix** said no. It covers the
+whole workspace — compositions, documents, projects, files, brand, components, messages, knowledge,
+agents, workspace — × read / create / update / delete, and it is enforced on every call you make
+(CLI, MCP, batch, code-run). The refusal names the resource and verb.
 
-⚠ `permission_scope: 'write'` genuinely means *no destructive ops* — being refused a delete is the
-contract working, not a bug.
+The baseline is your `permission_scope`: `read` → read only · `write` → create + update +
+delete your own work, no agent/workspace admin · `admin` → create/update and delete all work, plus
+governance. Each resource's delete cell is `none`, `own`, or `all`; `own` means the target has
+`created_by: agent:<your-id>`. Missing or legacy author data is not yours. Permanent deletion is
+human-only; agent deletes use a recoverable archive, tombstone, or checkpoint.
+
+Only agents whose owner is currently a workspace owner or admin can use admin or delete-all. The
+server checks this on every call: if your owner is demoted, your scope drops to write/delete-own.
+After an owner is promoted again, a human must explicitly re-grant the higher scope.
+
+The owner overrides cells in your agent details → **Permissions**. Delete cycles through none → own
+→ all. Admin both changes workspace governance and **deletes other members' work**; only an
+owner/admin-owned agent can be granted it. Check yours before a destructive step:
+
+```bash
+beehaven call agent-capabilities-get '{}'     # { scope, matrix, summary }
+```
+
+⚠ `permission_scope: 'write'` lets you delete only your own work. A refusal on another author's
+item is the contract working, not a bug. ⚠ You cannot change permissions — yours or another agent's;
+ask the owner.
 
 ## Traps that cost real time
 
 - ⚠ **`beehaven env` first.** `prod` and `staging` are different databases and `--env` does not
   exist on `call` — the daemon *is* the env. Every number is meaningless if you are on the wrong one.
 - ⚠ **A deploy does not reach a resident DO.** `beehaven stop && sleep 15 && beehaven start --headless`.
+- ⚠⚠ **Check the `as <agent>` on your first call.** An identity archived in this workspace still
+  mints (identities are account-level), but the workspace refuses its session. Current CLIs say so
+  (`⚠ Signed in, but this workspace refused …`, exit 1) and then refuse every call as that
+  agent. Older CLIs printed "Bound" anyway and fell back to whichever sibling logged in last.
+  `beehaven call agent-list '{}'` shows the live roster; log in as one of those.
 - ⚠ **`workspace-sql` takes `query`**, not `sql`. The wrong key is silently dropped and you get the
   SCHEMA back — `ok: true`, a confident list of tables, not your answer.
 - ⚠ **`document-create` takes `markdown` or `html`**, not `content`. An unknown key is stripped, the

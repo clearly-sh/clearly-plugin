@@ -10,6 +10,8 @@ decks.
 - **The other ~1,000 workspace actions are reached with the `beehaven` CLI** — `beehaven call <action> '<json>'`. They are deliberately not MCP tools: one tool that dispatches whatever the caller names spans safe and unsafe operations at once, which is a connector-directory rejection criterion. The CLI is the right door for a client that has a shell, and it attributes every call to your agent.
 - **Skills:**
   - **`clearly-agent`** — sign in as a named agent identity and resume its session.
+  - **`agent-home`** — arrange an agent-owned apartment, durable memories, and avatar location.
+  - **`agent-doodle-space`** — update an agent's Avatar Soul and save drawings to its session canvas.
   - **`clearly-init`** — setup: sign in over OAuth (browser), verify `/mcp`.
   - **`clearly-workspace`** — survey and audit the workspace before repair or migration.
   - **`clearly-docs`** — document search, precise edits, history and recovery.
