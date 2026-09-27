@@ -105,11 +105,62 @@ Use `canvas.place {kind,id,x,y,w,h,name,parentId?}` to put a workspace object (d
 deck, sheet, board, ticket, project, site or file) on the canvas as a live card. With
 `parentId`, `x/y` are relative to that frame, like `canvas.create-node`. See
 [project-plans.md](project-plans.md).
-Use `canvas.list-sources`/`canvas.place-source` for library assets. A native image
-node accepts `src`. Upload local media using `canvas-upload-image` (discover its current
-schema), then place its returned URL. Inspect the actual asset before using it. Prefer
-provided, reusable or purpose-made imagery to random URL placeholders. Label temporary
-assets in the handoff and replace them when final assets are part of the request.
+Use `canvas.list-sources`/`canvas.place-source` for an existing library asset. A native
+image node accepts an absolute `http(s)` `src`, never a local path or raw base64.
+Inspect the actual asset before placing it. Prefer provided, reusable or purpose-made
+imagery to random URL placeholders. Label temporary assets in the handoff.
+
+### Local images from the CLI
+
+`beehaven canvas add-image` uploads a PNG, JPEG, WebP, GIF or AVIF from disk through
+`get-upload-url` → binary PUT → `file-uploaded {composition:true}`, then appends an
+image node with `canvas-add-image`. The binary does not cross the relay WebSocket.
+This matters above about 900 KB: sending multi-megabyte base64 through
+`canvas-upload-image` can exceed the relay message limit. The asset is filed under
+the composition rather than added as a loose item in Recents.
+
+```sh
+beehaven canvas add-image ./photo.png --composition <id> \
+  --x 120 --y 160 --width 600 --height 400 --json
+```
+
+The command reports `nodeId` and `imageFileId`. Coordinates are world coordinates;
+omit both `--x`/`--y` to use canvas auto-placement, and omit both size flags to use
+the image's native dimensions. Check `beehaven canvas` help on the installed CLI:
+older versions do not have this command. On one of those, use the documented
+`get-upload-url` → binary PUT → `file-uploaded` sequence, then
+`canvas-act {action:"canvas.create-node",args:{type:"image",src:<absolute URL>,x,y,w,h}}`.
+The upload intent's `publicUrl` may be `/f/...`; prefix the active relay's HTTPS
+origin before storing it as `src`. `beehaven teleport --composition` stores a file
+but does not place an image node. `canvas-upload-image` remains useful for small
+inline images, followed by `canvas.create-node` or `canvas-add-image` using its `url`.
+The CLI command caps a file at 100 MiB, and the workspace plan may impose a smaller
+single-file or remaining-storage limit. Uploading and rendering are separate checks:
+the headless renderer has image-count and memory budgets, so inspect a review PNG
+after adding large images instead of treating upload success as visual proof.
+In the editor, paste/drop also uses presigned binary PUT. Saved canvas images are
+registered under the composition without adding loose cards to Recents. If a large
+upload fails, retry the upload; it must not be inlined into the scene JSON.
+
+For a composed artboard, nest the image with `canvas.update-nodes` using the returned
+`nodeId` and `patch:{parentId:<frame id>,name:"descriptive layer name"}`. The
+membership-only patch keeps its world position. Review the artboard after this:
+reviewing a frame excludes overlapping top-level images that are not its children.
+Image nodes are square-edged by default. If you set `radius` for a rounded crop,
+omit a square backing tile behind it or give that tile the same radius; otherwise
+the backing shows through as dark wedges at the corners.
+
+### Images from MCP
+
+The seven artifact MCP tools do not upload local binary files or dispatch `canvas-act`.
+For an image already reachable by an absolute URL, read the composition with
+`clearly_read {type:"composition",target:<id>}`; append an image node
+`{id,type:"image",src,x,y,w,h,fit:"contain",parentId?}` to the returned complete node
+array; then call `clearly_write {type:"composition",target:<id>,content:<JSON array>,
+expectedRev:<canvasNodesRev>}`. Preserve every existing node. A stale revision is a
+merge prompt, never a reason to drop `expectedRev`. `clearly_edit` can change an
+existing image's `src`, `fit` or geometry, but cannot create a node. For a local file,
+use the CLI upload path first; an MCP-only client needs a URL it can already access.
 
 Current headless rendering can resolve images, including workspace media. A blank image
 can indicate fetch, decoding or budget failure; check its source and inspect a live view.

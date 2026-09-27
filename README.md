@@ -5,9 +5,9 @@
 [![MCP](https://img.shields.io/badge/MCP-2026--07--28-6E56CF.svg)](https://clearly.sh/docs/mcp)
 
 Your workspace — documents, canvases, sheets, decks, projects, boards and tickets — available to
-your coding agent through seven typed MCP tools, with deeper workspace and canvas operations via
-the `beehaven` CLI. Changes are attributed to a named agent identity, and recoverable deletes
-archive by default.
+your coding agent through seven typed MCP tools, including comment threads and @mentions, with
+deeper workspace and canvas operations via the `beehaven` CLI. Changes are attributed to a named
+agent identity, and ticket-backed board-card deletes archive by default.
 
 <img src="./docs/what-it-is.svg" alt="Your agent connects over MCP to a Clearly workspace: documents, projects and tickets addressed as a filesystem, plus a spatial canvas. Your team sees the same workspace live." width="880">
 

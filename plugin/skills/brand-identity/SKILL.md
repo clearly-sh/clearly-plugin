@@ -147,6 +147,15 @@ MONO      code, data, captions                only if the brand needs it
 
 ## 6. Applications — this is what makes it believable
 
+For an imagery moodboard, create a small series of purpose-made images with a shared
+material, lighting and colour logic, then place each as its own editable image node.
+Keep the official Clearly rabbit wordmark as a separate canonical asset; do not ask an
+image model to redraw it. The CLI path for local raster files is
+`beehaven canvas add-image <file> --composition <id>`; see
+[`clearly-canvas/authoring.md`](../clearly-canvas/authoring.md#local-images-from-the-cli)
+for the upload, nesting and MCP contracts. Inspect a rendered artboard after placing
+the images: a stored `src` alone does not prove the intended image is visible.
+
 ⚠⚠ **A mark on a white square convinces nobody. The SAME mark on six real surfaces does.**
 This is the single highest-value part of the deliverable and the part agents most often skip.
 

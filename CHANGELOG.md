@@ -4,6 +4,19 @@ Notable changes to the plugin and the MCP surface it connects to.
 The surface is versioned separately from this repo — `initialize` reports it as
 `serverInfo.version`.
 
+## 0.8.3 — 2026-09-27
+
+### Plugin
+
+- Syncs the current 15-skill set from the monorepo, including comment and @mention guidance and the `canvas add-image` CLI path.
+- Documents the Beehaven CLI's account-free `handoff` flow for sharing work with a new user.
+
+### MCP surface 2.0.0
+
+- Adds comment-thread reads/writes and `@me` mention reads through the typed tools.
+- Removes catalog-discovered direct sprint deletion, ticket unlink and project deletion; ticket-backed board-card deletion now archives.
+- Reconnect clients using removed tool names and refresh any cached catalog schemas.
+
 ## 0.8.2 — 2026-09-26
 
 ### Plugin

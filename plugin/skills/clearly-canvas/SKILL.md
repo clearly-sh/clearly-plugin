@@ -142,7 +142,10 @@ matches the chosen direction, then adapt and inspect it. It is not an art direct
 a quality guarantee. Custom compositions should use native nodes and your own builder.
 
 Read [authoring.md](authoring.md) before building. It covers the exact coordinate,
-batch, text, asset and MCP contracts. Consult `canvas-catalog` for action schemas
+batch, text, image-upload and MCP contracts. For a local image, use
+`beehaven canvas add-image <file> --composition <id>` when the installed CLI supports
+it; read authoring.md for the current CLI fallback and the MCP URL-only path.
+Consult `canvas-catalog` for action schemas
 instead of loading an exhaustive reference.
 
 ## 4. Build a representative surface, then complete the artifact

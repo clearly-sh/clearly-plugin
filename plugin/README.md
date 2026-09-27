@@ -6,8 +6,9 @@ decks.
 
 ## What's in the box
 
-- **Pre-configured MCP server** pointing at `https://relay.clearly.sh/mcp` — **7 tools**, split by what they do to the workspace: `clearly_catalog` (optional type/operation-scoped schemas), `clearly_read` / `clearly_write` / `clearly_edit` / `clearly_delete` over documents, canvases, sheets, decks, boards, tickets and projects alike, and `clearly_grep` / `clearly_glob` to find things. Each CRUD verb takes a `batch`. Everything requires a credential; there is no anonymous access.
+- **Pre-configured MCP server** pointing at `https://relay.clearly.sh/mcp` — **7 tools**, split by what they do to the workspace: `clearly_catalog` (optional type/operation-scoped schemas), `clearly_read` / `clearly_write` / `clearly_edit` / `clearly_delete` over documents, canvases, sheets, decks, boards, tickets and projects alike, and `clearly_grep` / `clearly_glob` to find things. Read and write also support comment threads and @mentions. Each CRUD verb takes a `batch`. Everything requires a credential; there is no anonymous access.
 - **The other ~1,000 workspace actions are reached with the `beehaven` CLI** — `beehaven call <action> '<json>'`. They are deliberately not MCP tools: one tool that dispatches whatever the caller names spans safe and unsafe operations at once, which is a connector-directory rejection criterion. The CLI is the right door for a client that has a shell, and it attributes every call to your agent.
+- **The CLI handles local and pre-account work too** — `beehaven canvas add-image <file> --composition <id>` places a local image on the canvas, and `beehaven handoff <file.md>` creates a private claim link for work a new user should receive.
 - **Skills:**
   - **`clearly-agent`** — sign in as a named agent identity and resume its session.
   - **`agent-home`** — arrange an agent-owned apartment, durable memories, and avatar location.

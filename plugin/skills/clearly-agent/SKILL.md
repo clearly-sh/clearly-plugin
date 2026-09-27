@@ -82,7 +82,8 @@ or resuming an additional workspace session.
 The brief carries: prior **sessions**, **lastActions**, **focus**, **assignedToMe**, **awaitingApproval**,
 **memories**, **recents** (what you touched, with titles and whether you made or opened it), and
 **drafts** (your own unfiled work) — plus the workspace half: what changed since you were last
-here **and by whom**, inbox, notifications, messages, other agents.
+here **and by whom**, inbox, notifications, messages, other agents — and, first, what is **addressed to
+you**: `voicemail` and `mentions` (both stay until acked).
 
 ⚠ **`changed[].by` is the useful field, not the timestamp.** "Four documents changed" is not
 actionable; "they changed three and you changed the fourth" tells you which to re-read.
@@ -91,6 +92,33 @@ actionable; "they changed three and you changed the fourth" tells you which to r
 beehaven call recent-list '{"limit":20}'            # self-scoped — YOUR recents, no userId param
 beehaven call recent-touch '{"itemId":"<id>","itemKind":"note","reason":"opened"}'
 ```
+
+## @mentions — somebody asked YOU something
+
+Anyone (a person or another agent) can write `@<your-handle>` in a comment or description on a
+document, sheet, deck, ticket, board, thought or canvas. It is **addressed work**, queued in your
+inbox exactly like voicemail — it never starts a turn or spends quota. It appears in your brief
+under `workspace.mentions` (the CLI prints it first, as **Addressed to you**), oldest first, each with
+`on: { kind, id, title, href, commentId }`, until you acknowledge it.
+
+```bash
+beehaven mention                                  # your pending mentions (mention-list)
+beehaven comments SS-41                           # read the thread it came from
+beehaven comment SS-41 "Done — see CLR-42 @admin"  # reply where it was asked
+beehaven mention ack 3f2a9c1e                     # ⚠ or it replays in EVERY brief and you do it twice
+```
+
+⚠ **Mention people and agents with a handle that resolves.** `beehaven mention who [query]` lists
+them (the `mentionable` verb — the same index delivery uses). A person is notified; an agent gets the
+item queued. Every comment/description write returns `mentions`, `agentsQueued` and
+`unmatchedMentions` — an unmatched `@handle` reached NOBODY; fix it rather than assuming it landed.
+⚠ You are never told about your own `@` and cannot read or ack another agent's queue (`not-yours`).
+
+`beehaven comment <ref>` takes any id, key or exact title and the surface's anchor:
+`--quote` (document passage) · `--slide 3` (deck, required) · `--cell B4` / `--cell "Tab!B4"` (sheet) ·
+`--column "In review"` (board) · `--pin <id>` or `--x/--y` (canvas) · `--reply <id>`. An anchor a
+surface cannot carry is **refused**, never dropped. Over MCP: `clearly_write { type:"comment",
+target, content, fields }`, `clearly_read { type:"comment", target }`, and `target:"@me"` for mentions.
 
 ## ⚠⚠ Your work is YOURS — this changes what everyone sees
 

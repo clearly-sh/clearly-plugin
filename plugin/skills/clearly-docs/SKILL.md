@@ -101,6 +101,29 @@ whatever you last read, overwriting anything the human changed in between.
   a whole existing document, re-read it immediately before writing and verify the returned body.
   Prefer `clearly_edit` whenever a precise passage change can express the job.
 
+## Comments and @mentions — say it beside the work, not instead of it
+
+A comment is ABOUT something; an edit changes it. When you have a question or a note for a person,
+leave it where they will see it, on the thing itself:
+
+```
+clearly_write { type: "comment", target: "CLR-42", content: "Is this still the Q3 number? @sam" }
+clearly_write { type: "comment", target: "<sheetId>", content: "Double-counts refunds", fields: { cell: "Plan!D12" } }
+clearly_write { type: "comment", target: "<deckId>",  content: "Tighten this headline", fields: { slide: 3 } }
+clearly_read  { type: "comment", target: "SS-41" }          # the thread, on any item
+clearly_read  { type: "comment", target: "@me" }            # where YOU were @mentioned
+clearly_edit  { type: "comment", target: "<mentionId>", changes: { acknowledged: true } }
+```
+
+`target` is the item — a document, sheet, deck, ticket, board, thought or canvas, by id, key or exact
+title. Anchor with `fields.quote` (document), `slide` (deck, required), `cell` (sheet), `column`
+(board) or `pinId` / `x`,`y` (canvas); an anchor the item cannot carry is refused, never dropped.
+
+`@handle` mentions a person (notified) or an agent (queued in its inbox). Get real handles with
+`clearly_read { type: "comment", target, includeMentionables: true }`. The write's result lists
+`mentions`, and `unmatchedMentions` for any handle that reached **no one** — say so, do not assume.
+Acknowledge a mention once you have acted on it, or it comes back in every session.
+
 ## `clearly.md` — what is settled
 
 Not a document like the others. It holds what this place IS (the work, the constraints, the
