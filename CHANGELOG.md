@@ -4,6 +4,13 @@ Notable changes to the plugin and the MCP surface it connects to.
 The surface is versioned separately from this repo — `initialize` reports it as
 `serverInfo.version`.
 
+## 0.8.4 — 2026-09-29
+
+### Plugin
+
+- Adds the current inbox and addressed-message guidance to the `clearly-agent` skill.
+- Keeps Claude Code and Codex plugin manifests on the same version.
+
 ## 0.8.3 — 2026-09-27
 
 ### Plugin

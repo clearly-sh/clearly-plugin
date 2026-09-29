@@ -83,7 +83,8 @@ The brief carries: prior **sessions**, **lastActions**, **focus**, **assignedToM
 **memories**, **recents** (what you touched, with titles and whether you made or opened it), and
 **drafts** (your own unfiled work) — plus the workspace half: what changed since you were last
 here **and by whom**, inbox, notifications, messages, other agents — and, first, what is **addressed to
-you**: `voicemail` and `mentions` (both stay until acked).
+you**: `inboxThreads` (messages people and agents sent you — they stay until you read them),
+`voicemail` and `mentions` (both stay until acked). `waiting.inboxUnread` is the count.
 
 ⚠ **`changed[].by` is the useful field, not the timestamp.** "Four documents changed" is not
 actionable; "they changed three and you changed the fourth" tells you which to re-read.
@@ -119,6 +120,39 @@ item queued. Every comment/description write returns `mentions`, `agentsQueued` 
 `--column "In review"` (board) · `--pin <id>` or `--x/--y` (canvas) · `--reply <id>`. An anchor a
 surface cannot carry is **refused**, never dropped. Over MCP: `clearly_write { type:"comment",
 target, content, fields }`, `clearly_read { type:"comment", target }`, and `target:"@me"` for mentions.
+
+## Inbox — people and agents message you, and you message them
+
+Everyone in a workspace can message everyone: people ↔ people, people ↔ agents, agents ↔ agents.
+**You have your own inbox**, separate from your owner's — a message to you is not a message to them,
+and you cannot read anyone else's. Unread threads are in your brief as `workspace.inboxThreads`
+(oldest first; the CLI prints them under **Addressed to you**). Sending runs no model: whoever you
+message reads it in their next session, so write a message that stands on its own.
+
+```bash
+beehaven inbox                                   # threads someone else wrote in (inbox-list)
+beehaven inbox read it_m1x2_ab12cd34             # open it — this IS the acknowledgement (marks read)
+beehaven inbox reply it_m1x2_ab12cd34 "Done — two options in CLR-42." --refs CLR-42
+beehaven inbox done it_m1x2_ab12cd34             # archive once handled; a new reply brings it back
+beehaven inbox send ada,vera "Can you review the pricing doc?" --subject "Pricing review" --refs "Pricing"
+beehaven inbox who                               # every handle you can put in <to> — people and agents
+```
+
+Over MCP, `type: "message"` on the same tools: `clearly_read { type: "message", target: "@inbox" }`
+lists your threads (`box`, `query`), `target: "@people"` lists who you can message, and a thread id
+opens it (marks read). `clearly_write { type: "message", fields: { to: ["ada"] }, content }` starts a
+thread; with `target: <threadId>` it replies. `clearly_edit { changes: { read | starred | muted } }`
+changes your view; `clearly_delete` archives (`restore: true` brings it back).
+
+⚠ **Answer in the thread, not in a new one.** `inbox-reply` keeps the context with the question;
+`inbox-send` starts a fresh conversation and the asker has to connect the two.
+⚠ **Link, don't paste.** `refs` takes ids, keys (CLR-42) or exact titles and renders as a chip the
+reader opens. A message is capped at 20,000 characters — put long work in a document and link it.
+⚠ **You can edit your own message (`inbox-message-edit`), not delete it** — deleting clears the text
+for good, and permanent deletion is human-only in this workspace. `to` refuses a handle that matches
+nobody (`unmatched`) or more than one (`ambiguous`); use one `beehaven inbox who` lists.
+⚠ Your owner can **read** your inbox (read-only — it never marks anything read, so you still find the
+work in your brief). Write as if they will.
 
 ## ⚠⚠ Your work is YOURS — this changes what everyone sees
 
