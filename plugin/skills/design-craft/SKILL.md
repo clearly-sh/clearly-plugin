@@ -132,6 +132,10 @@ headline estimated at 867px measured **990**.
 
 ## 3. Colour — a system, not a mood board
 
+⚠ **A workspace brand kit already IS this role list.** `beehaven call brand-tokens '{}'`
+returns ground, ink, muted, accent and support roles (light and dark) with their contrast
+already measured. Use those values; the list below is for when there is no kit.
+
 **Build the palette from a role list, not from colours you like:**
 
 ```

@@ -57,10 +57,19 @@ Create normalizes hex colours; raw stored scenes use RGBA arrays in 0..1.
 
 - `frame.create` and `canvas.create-node` with `parentId` take coordinates **relative
   to that parent**. Create the frame first. Names can resolve earlier nodes in a batch.
+  A frame nested in a frame (a dark band inside an artboard) needs a worker from
+  2026-10-02 or later; on an older one, create it at world coordinates and attach it with
+  `canvas.update-nodes {ids:[id], patch:{parentId}}` (membership only, position kept).
+  To move a node INTO a frame and place it in one patch, pass `parentId` with frame-relative x/y.
+- Component templates (`component-create`) are different: every node's x/y is relative
+  to the component ROOT, even under an inner frame.
 - Persisted nodes and perception bounds use **world coordinates**. Raw scene replacement
   through `composition-patch`/MCP must use world coordinates, even with `parentId`.
-- `canvas.update-nodes` geometry is world geometry. For group moves/resizes use the
-  catalog's frame/arrangement/scale actions; do not assume a patch reflows children.
+- `canvas.update-nodes` geometry is world geometry — EXCEPT when the same patch also sets
+  `parentId`: then x/y are relative to that frame, exactly like `canvas.create-node`. A
+  membership-only patch (`parentId` without x/y) keeps the node's world position. For group
+  moves/resizes use the catalog's frame/arrangement/scale actions; do not assume a patch
+  reflows children.
 - Build backgrounds before foregrounds. Use `canvas.order` to change stacking.
 - Name nodes uniquely; use returned IDs where names collide. Parent content to its
   frame so movement, selection, clipping and reviews can treat it as one artifact.
@@ -124,9 +133,11 @@ beehaven canvas add-image ./photo.png --composition <id> \
   --x 120 --y 160 --width 600 --height 400 --json
 ```
 
-The command reports `nodeId` and `imageFileId`. Coordinates are world coordinates;
-omit both `--x`/`--y` to use canvas auto-placement, and omit both size flags to use
-the image's native dimensions. Check `beehaven canvas` help on the installed CLI:
+The command reports `nodeId`, `imageFileId` and `src` (the stored URL — reuse it, e.g. as a
+brand logo). Coordinates are world coordinates; omit both `--x`/`--y` to use canvas
+auto-placement, and omit both size flags to use the image's native dimensions (read from
+the file header for PNG, JPEG, GIF and WebP). A negative coordinate works as `--x -3000`
+on CLI 0.8.24+; older CLIs need `--x=-3000`. Check `beehaven canvas` help on the installed CLI:
 older versions do not have this command. On one of those, use the documented
 `get-upload-url` → binary PUT → `file-uploaded` sequence, then
 `canvas-act {action:"canvas.create-node",args:{type:"image",src:<absolute URL>,x,y,w,h}}`.

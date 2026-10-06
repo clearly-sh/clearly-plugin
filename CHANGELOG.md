@@ -4,6 +4,16 @@ Notable changes to the plugin and the MCP surface it connects to.
 The surface is versioned separately from this repo — `initialize` reports it as
 `serverInfo.version`.
 
+## 0.8.5 — 2026-10-06
+
+### Plugin
+
+- `clearly-agent`: end each work session with `beehaven agent handoff "…"` — the note the next login (or the next agent) reads first, under **Last time you were here**. Needs Beehaven CLI 0.8.25+.
+- `clearly-agent` and `clearly-canvas`: start UI work from the workspace's own brand (`brand-tokens`) and component library (`component-list`), and design before you build.
+- `clearly-agent`: the canonical write fields — `document-create` takes `markdown` or `html`; `ticket-create` / `ticket-update` take `issueType` and `body`.
+- `clearly-canvas`: `canvas add-image` reports `nodeId`, `imageFileId` and `src` for reuse; `design-craft` refreshed.
+- Keeps Claude Code and Codex plugin manifests on the same version.
+
 ## 0.8.4 — 2026-09-29
 
 ### Plugin

@@ -75,6 +75,17 @@ the admitted agent in the workspace, and soul reads/updates report whether the d
 wearing the drawing or a preset. If the capability line is absent, it is disabled for that
 deployment; the existing companion and presets remain available.
 
+## End with a handoff
+
+```bash
+beehaven agent handoff "what you did · what is next · anything blocked"
+```
+
+The handoff is the note your next login, or the next agent you hand the work to, reads first,
+under **Last time you were here**. Write it for a colleague who has none of your context: what changed,
+where it is (ticket keys, document titles), what is next and what is blocked. It ends the work session
+and keeps your identity bound. Without one, the next brief can show only the session's label and counts.
+
 ⚠ **Do not call `agent-login` immediately after `beehaven agent login`.** The RPC is an alias of
 `agent-session-start`; doing both creates two sessions. Call it directly only when deliberately starting
 or resuming an additional workspace session.
@@ -170,6 +181,15 @@ teammate or another agent needs your work, move it into a project you both belon
 ⚠ Creating something does **not** put it in your owner's Recents — that is deliberate. They find it
 in Drafts. Opening it is what makes it recent *for them*.
 
+## Designing UI? Use the workspace's brand and components — and design before you build
+
+A workspace stores its brand (`brand-tokens`) and its component library (`component-list`) as data.
+Anything visual you make — a canvas, a deck, a mockup of a screen you are about to implement —
+starts from those, placed with `component-instantiate {compositionId, instances:[…]}`. When the
+task changes a product's UI, the composition comes FIRST: build the screen and its states there,
+`canvas.review` it, link it to the ticket (`work-link {ticketId, kind:"design", refKind:"composition",
+refId}`), then implement. `clearly-canvas` §0 has the details.
+
 ## When a write is refused
 
 `agent-denied-create` / `-update` / `-delete` mean your **capability matrix** said no. It covers the
@@ -211,7 +231,8 @@ ask the owner.
   `beehaven call agent-list '{}'` shows the live roster; log in as one of those.
 - ⚠ **`workspace-sql` takes `query`**, not `sql`. The wrong key is silently dropped and you get the
   SCHEMA back — `ok: true`, a confident list of tables, not your answer.
-- ⚠ **`document-create` takes `markdown` or `html`**, not `content`. An unknown key is stripped, the
-  document is created empty, and it is **invisible to `document-search` forever**.
-- ⚠ **`ticket-create` takes `issueType`, not `type`** (the wire uses `type` as the action
-  discriminator) and **`body`, not `description`**. Both fail silently.
+- **`document-create` takes `markdown` or `html`.** `content`, `body` and `text` are accepted as
+  markdown aliases, but prefer `markdown`.
+- **`ticket-create` / `ticket-update` take `issueType` and `body`.** The wire uses `type` as the action
+  name, so the CLI moves a top-level `type` to `issueType` for you and refuses it on verbs with no
+  such field. `description` is accepted as `body`.

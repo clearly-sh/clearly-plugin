@@ -47,6 +47,36 @@ A new composition almost always needs at least one revision after its first rend
 the pass finds nothing, look again at the thumbnail. If there is still nothing, say what
 you checked. Never make a change only to show that a review happened.
 
+## 0. Start from the workspace's brand and component library
+
+A workspace keeps its brand and its components as data. Read them before you draw, and
+build from them — redrawing a button the library already has is how designs drift from the
+product they describe.
+
+```sh
+beehaven call brand-tokens '{}'                                   # colours (light + dark), type roles, radius, logos, voice
+beehaven call component-list '{"query":"<brand or kind>"}'        # parts, with props, variants and the code they mirror
+beehaven call component-instantiate '{"compositionId":"<id>","instances":[
+  {"id":"<component>","x":96,"y":200,"variant":"Light"},
+  {"id":"<component>","x":96,"y":280,"variant":"Light","props":{"label":"Save changes"}}]}'
+```
+
+- `instances` places many parts with ONE scene read and ONE write; never loop single
+  placements. `mode:"dark"` resolves brand colours against the brand's dark palette.
+- Placed instances are ordinary editable nodes whose root remembers its master
+  (`libraryComponentId`). Edit freely; a genuinely new part goes back into the library with
+  `component-create` (or `{ fromCompositionId, nodeId }` to save one you drew).
+- Component node coordinates are relative to the component ROOT, even under an inner
+  frame — the opposite of `canvas.create-node`, where x/y follow `parentId`.
+- If the workspace has a brand kit, it IS the system for the brief: use its roles, faces
+  and voice rather than inventing a palette. Change the brand itself only when asked.
+
+**UX design before implementation.** When the work is a change to a product's UI, the
+composition is the design the code will answer to: show the real states (empty, loading,
+error, long content, narrow width, dark theme), review it, and link it to the ticket with
+`work-link {"ticketId":"…","kind":"design","refKind":"composition","refId":"<id>"}`
+before implementation starts.
+
 ## 1. Establish the brief and inspect the material
 
 Read the supplied canvas, copy, brand and references before drawing. Resolve:
@@ -117,8 +147,9 @@ multiple colours and dense pages can all be appropriate. Choose deliberately.
 
 ## 3. Define a small design system and code the composition
 
-Write a local JS/Python builder when the artifact has repeated elements or several
-artboards. Use named tokens, helpers, arrays and layout arithmetic as you would in
+When §0 found a brand kit and components, they are the system: map the brief onto their
+roles, then add only what the brief genuinely needs. Write a local JS/Python builder when
+the artifact has repeated elements or several artboards. Use named tokens, helpers, arrays and layout arithmetic as you would in
 HTML/CSS. The CLI can submit the complete generated payload. You do not need to
 hand-author hundreds of coordinates in a chat message.
 
@@ -157,6 +188,21 @@ For a single page, establish the complete hierarchy before polishing small detai
 Use a batch for each coherent build or revision, with descriptive unique layer names.
 Parent content to its artboard. Inspect every operation result and rollback status.
 Save your builder and returned IDs so revisions are targeted and reproducible.
+
+⚠ **Batch, never loop.** One `canvas-act` batch of hundreds of steps is one scene read,
+persisted every 50 steps, and the workspace stays responsive for everyone in it while it
+runs. The same steps sent as hundreds of separate calls each re-read the whole scene. If a
+call fails with a dropped connection, read the scene (`composition-detail
+{id, includeScene:true}`) before retrying: the work may have landed.
+
+⚠ **One batch per canvas at a time.** A reply that times out ("outcome unknown") or drops does
+not stop the batch — it is still running on the workspace. Resending at once used to start a
+second, slow, unprotected batch and could half-apply both (CA-43). The workspace now queues a
+second writer behind the first and answers `code: "canvas-busy"` (with the running batch's
+progress) if it waits too long — nothing from that call was applied. Either way: read the scene,
+then send only what is missing. A ~1,100-step build takes about 40 s; the CLI waits 180 s by
+default and `--timeout <ms>` (or `BEEHAVEN_RPC_TIMEOUT_MS`) raises it. Never place component
+instances after a build whose reply you did not see.
 
 Keep review notes and status outside the delivered artwork. Use
 [communications.md](communications.md) only when posting those blocks is useful.
