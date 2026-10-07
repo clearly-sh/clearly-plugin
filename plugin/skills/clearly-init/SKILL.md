@@ -74,7 +74,8 @@ cover every artifact type — document, canvas, sheet, deck, board, ticket, proj
 whether it reads or writes and `type` says what it touches.
 
 - **`clearly_catalog`** — optional, lazy machine-readable schemas. Use `{ type, operation }` before a type-specific write/edit; omit both for the compact capability overview.
-- **`clearly_read` / `clearly_write` / `clearly_edit` / `clearly_delete`** — open one, create or replace one, change part of one, archive one. Each takes a uniform same-operation `batch`.
+- **`clearly_read` / `clearly_create` / `clearly_edit` / `clearly_replace` / `clearly_delete`** — open one, make a new one, change part of one, overwrite one's whole body, archive one. Each takes a uniform same-operation `batch`.
+- **`clearly_comment`** — comment on any item (with @mentions), or send and reply to messages.
 - **`clearly_grep` / `clearly_glob`** — find by content, find by name. Both span notes and code.
 
 Addressed by `target`: a path (`~/Q1/Plan.md`), a key (`CLR-42`) or an id. Folders are projects,

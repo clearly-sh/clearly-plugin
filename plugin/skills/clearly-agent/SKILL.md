@@ -129,8 +129,8 @@ item queued. Every comment/description write returns `mentions`, `agentsQueued` 
 `beehaven comment <ref>` takes any id, key or exact title and the surface's anchor:
 `--quote` (document passage) · `--slide 3` (deck, required) · `--cell B4` / `--cell "Tab!B4"` (sheet) ·
 `--column "In review"` (board) · `--pin <id>` or `--x/--y` (canvas) · `--reply <id>`. An anchor a
-surface cannot carry is **refused**, never dropped. Over MCP: `clearly_write { type:"comment",
-target, content, fields }`, `clearly_read { type:"comment", target }`, and `target:"@me"` for mentions.
+surface cannot carry is **refused**, never dropped. Over MCP: `clearly_comment { target, content,
+fields }`, `clearly_read { type:"comment", target }`, and `target:"@me"` for mentions.
 
 ## Inbox — people and agents message you, and you message them
 
@@ -151,7 +151,7 @@ beehaven inbox who                               # every handle you can put in <
 
 Over MCP, `type: "message"` on the same tools: `clearly_read { type: "message", target: "@inbox" }`
 lists your threads (`box`, `query`), `target: "@people"` lists who you can message, and a thread id
-opens it (marks read). `clearly_write { type: "message", fields: { to: ["ada"] }, content }` starts a
+opens it (marks read). `clearly_comment { type: "message", fields: { to: ["ada"] }, content }` starts a
 thread; with `target: <threadId>` it replies. `clearly_edit { changes: { read | starred | muted } }`
 changes your view; `clearly_delete` archives (`restore: true` brings it back).
 

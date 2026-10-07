@@ -4,6 +4,18 @@ Notable changes to the plugin and the MCP surface it connects to.
 The surface is versioned separately from this repo — `initialize` reports it as
 `serverInfo.version`.
 
+## 0.8.6 — 2026-10-07
+
+### Plugin
+
+- Skills and setup use the MCP 3.0 tool set: `clearly_create` makes a new item, `clearly_replace` overwrites a whole body, and `clearly_comment` comments or sends a message. Nine tools in all; `clearly_edit` stays the default for changing part of a document.
+- `clearly_write` is no longer taught. Servers on surface 3.0 still accept it as an unlisted alias, so older prompts keep working.
+- Keeps Claude Code and Codex plugin manifests on the same version.
+
+### Surface
+
+- Requires MCP surface 3.0.0 (`serverInfo.version` starts with `3.0.0`). Refresh a client's cached `tools/list` after upgrading.
+
 ## 0.8.5 — 2026-10-06
 
 ### Plugin

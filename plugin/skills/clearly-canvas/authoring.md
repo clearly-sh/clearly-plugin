@@ -163,11 +163,11 @@ the backing shows through as dark wedges at the corners.
 
 ### Images from MCP
 
-The seven artifact MCP tools do not upload local binary files or dispatch `canvas-act`.
+The artifact MCP tools do not upload local binary files or dispatch `canvas-act`.
 For an image already reachable by an absolute URL, read the composition with
 `clearly_read {type:"composition",target:<id>}`; append an image node
 `{id,type:"image",src,x,y,w,h,fit:"contain",parentId?}` to the returned complete node
-array; then call `clearly_write {type:"composition",target:<id>,content:<JSON array>,
+array; then call `clearly_replace {type:"composition",target:<id>,content:<JSON array>,
 expectedRev:<canvasNodesRev>}`. Preserve every existing node. A stale revision is a
 merge prompt, never a reason to drop `expectedRev`. `clearly_edit` can change an
 existing image's `src`, `fit` or geometry, but cannot create a node. For a local file,
@@ -212,8 +212,8 @@ MCP's artifact tools are split by operation:
 
 - `clearly_catalog {type:"composition"}` exposes the current schemas.
 - `clearly_read` returns nodes and `canvasNodesRev`.
-- `clearly_write` creates a composition or replaces its full node array; use
-  `expectedRev` from the read for replacement.
+- `clearly_create {type:"composition"}` makes a composition; `clearly_replace` replaces its full
+  node array — pass `expectedRev` from the read.
 - `clearly_edit` patches existing nodes with `changes:{ids,patch}`.
 
 Canvas action dispatch and targeted pixels use the CLI. Do not invent

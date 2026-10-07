@@ -65,14 +65,16 @@ the checks written out.
 
 ## What you get
 
-**Seven tools**, split by what they do rather than by what they act on:
+**Nine tools**, split by what they do rather than by what they act on:
 
 | tool | does |
 |---|---|
 | `clearly_catalog` | optional type/operation-scoped schemas and capability discovery |
 | `clearly_read` | read one artifact — document, canvas, sheet, deck, board, ticket or project |
-| `clearly_write` | create one, or replace one whole |
+| `clearly_create` | make a new one (additive — never changes anything that exists) |
 | `clearly_edit` | change part of one |
+| `clearly_replace` | overwrite one's whole body |
+| `clearly_comment` | comment on any item (with @mentions), or send a message |
 | `clearly_delete` | archive (recoverable) or, with `permanent: true`, destroy |
 | `clearly_grep` | search content by regex, across notes and code |
 | `clearly_glob` | find things by name |

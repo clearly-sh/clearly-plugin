@@ -67,7 +67,7 @@ Read-only, one statement, credential columns redacted.
 
 This is the part that makes documentation stay true, and it is the part agents skip.
 
-The MCP read/edit/write tools cover the current body. Document history is a separate CLI surface:
+The MCP read/edit/replace tools cover the current body. Document history is a separate CLI surface:
 
 - **`beehaven call document-status '{"limit":20}'`** lists recent changes. `mine: true` is the
   certain signal that the active agent made the latest change. `by: "unknown"` means the log has
@@ -85,9 +85,9 @@ own record. Never quietly restore what they took out.
 
 ## Editing
 
-**`clearly_edit` (find/replace) is the default. `clearly_write` REPLACES the whole document.**
+**`clearly_edit` (find/replace) is the default. `clearly_replace` REPLACES the whole document.**
 
-To change one line of a 12,000-character document, `write` makes you reproduce all 12,000 — and
+To change one line of a 12,000-character document, `replace` makes you reproduce all 12,000 — and
 anything you fail to retype is gone with no error. It is also a lost-update machine: it writes
 whatever you last read, overwriting anything the human changed in between.
 
@@ -97,7 +97,7 @@ whatever you last read, overwriting anything the human changed in between.
 - Several independent document edits can be sent in one tool call with `batch`, but each batch
   row is still one exact `{ target, find, replace, all? }` operation. There is no `multi_edit`
   field and the batch is not transactional; inspect the per-item results and retry only failures.
-- `clearly_write` does not accept `expected_content` or a commit-message field. If you must replace
+- `clearly_replace` does not accept `expected_content` or a commit-message field. If you must replace
   a whole existing document, re-read it immediately before writing and verify the returned body.
   Prefer `clearly_edit` whenever a precise passage change can express the job.
 
@@ -107,9 +107,9 @@ A comment is ABOUT something; an edit changes it. When you have a question or a 
 leave it where they will see it, on the thing itself:
 
 ```
-clearly_write { type: "comment", target: "CLR-42", content: "Is this still the Q3 number? @sam" }
-clearly_write { type: "comment", target: "<sheetId>", content: "Double-counts refunds", fields: { cell: "Plan!D12" } }
-clearly_write { type: "comment", target: "<deckId>",  content: "Tighten this headline", fields: { slide: 3 } }
+clearly_comment { target: "CLR-42", content: "Is this still the Q3 number? @sam" }
+clearly_comment { target: "<sheetId>", content: "Double-counts refunds", fields: { cell: "Plan!D12" } }
+clearly_comment { target: "<deckId>",  content: "Tighten this headline", fields: { slide: 3 } }
 clearly_read  { type: "comment", target: "SS-41" }          # the thread, on any item
 clearly_read  { type: "comment", target: "@me" }            # where YOU were @mentioned
 clearly_edit  { type: "comment", target: "<mentionId>", changes: { acknowledged: true } }
@@ -131,7 +131,7 @@ vocabulary, the decisions that stopped moving) and **how this person wants to be
 length, tone, format, and what irritates them, which is said once in passing and worth more than
 anything they praise.
 
-Fold a conclusion into it once it has stopped moving. Reach for `edit`, never `write`.
+Fold a conclusion into it once it has stopped moving. Reach for `edit`, never `replace`.
 
 ## Report what MOVED
 
