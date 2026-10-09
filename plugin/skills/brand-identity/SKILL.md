@@ -1,7 +1,7 @@
 ---
 name: brand-identity
 description: >-
-  Build a complete brand identity on a Clearly canvas the way a studio does —
+  Design the requested logo or brand identity on a Clearly canvas —
   brief, mark, wordmark, lockups and clear space, palette, type system,
   applications, and a spec board someone else can build from. Use when asked
   for a brand, a logo, an identity, a rebrand, a visual system, brand
@@ -13,10 +13,14 @@ description: >-
 
 # brand-identity — a system, not a picture of a logo
 
-⚠⚠ **THE DELIVERABLE IS A SYSTEM SOMEONE ELSE CAN BUILD WITH.** A single mark on a white
-artboard is not an identity; it is a drawing. Pentagram's identity work ships a symbol, a
-wordmark, a graphic system, a palette, a type system and the guidelines that let an in-house
-team keep it consistent. That is the shape to copy.
+Match the user's scope. For a logo concept, deliver the editable mark/wordmark, primary and
+one-color use, a small-size check, and the requested application. A logo plus landing page does
+not require merchandise, storefronts or a complete guideline deck. Add those when requested or
+when a concrete use in the brief requires them.
+
+For a complete identity request, the deliverable is a system someone else can build with:
+symbol, wordmark, palette, typography, applications and guidelines. Sections 6–8 describe that
+larger scope; they are optional for a narrow concept.
 
 Read **`design-craft`** first or alongside — grid, type scale, colour roles and the studio
 pass are assumed here.
@@ -93,7 +97,9 @@ good. If it does not work in flat black, the shape is wrong and the gradient is 
 - ⚠ **A wordmark is always tracked tighter than body text.** At display size, `letterSpacing`
   −1 to −4. Then fix the specific pairs the font gets wrong (an uppercase A next to a V, a
   T next to a lowercase o).
-- **Lockups are a fixed set, not an invitation.** Ship exactly these and say so:
+- **For a full identity, define this fixed set.** For a concept, deliver the requested lockup
+  plus the mark-only and one-color forms needed for its smallest use. Additional lockups are
+  optional unless the brief asks for them:
 
 ```
 primary      mark + wordmark, horizontal    ← the default
@@ -225,11 +231,11 @@ Run `design-craft`'s studio pass, plus these identity-specific ones:
 ```
 □ Rendered the mark at 24px and LOOKED at it
 □ Mark works in flat black, flat white, and knocked out
-□ Every lockup has stated clear space and minimum size
+□ Every delivered lockup has stated clear space and minimum size
 □ Palette has a dark-ground variant and role sentences
 □ Type scale has NUMBERS, not just face names
-□ At least 4 real applications, at real proportions
-□ Misuse section exists
+□ Requested applications at real proportions (4–6 for a full identity; the requested surface for a concept)
+□ Misuse section exists for a full identity; a concise use note is enough for a logo concept
 □ Put the mark beside the competitor named in UNLIKE — still distinct?
 □ Can someone build a new asset from this board without asking a question?
 ```

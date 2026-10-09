@@ -49,6 +49,12 @@ do not blindly resend only skipped operations. Mixed live/headless actions may h
 different rollback behavior. Use deterministic layer names and returned IDs to avoid
 duplicate content during retries.
 
+Also check ignored/rejected fields, warnings, mutation outcome and actual changed IDs. A matched
+node or `ok:true` receipt alone is not proof of an update. The bundled `assertReceipt` helper can
+reject partial drops; `requireChange:true` rejects an unexpected no-op. A deliberate replay may
+be unchanged and should reuse its previous evidence instead of recreating nodes.
+Keep executed payloads and returned-ID manifests separate from regenerated plans.
+
 ## Node shape and coordinates
 
 Fields are flat: `{name,type,x,y,w,h,text,size,family,fontWeight,fill,...}`.
@@ -71,6 +77,13 @@ Create normalizes hex colours; raw stored scenes use RGBA arrays in 0..1.
   moves/resizes use the catalog's frame/arrangement/scale actions; do not assume a patch
   reflows children.
 - Build backgrounds before foregrounds. Use `canvas.order` to change stacking.
+
+For create/update geometry, `coordinateSpace:"world"` or `"parent"` makes the intent explicit.
+Default behavior remains compatible with the rules above. Receipts include normalized world
+bounds and parent offsets where available. Template coordinates remain relative to their root.
+An SVG's bytes may be stored in `svgRef` once it exceeds the inline limit; this is valid artwork,
+not a missing node. Replacing `svg` clears and rebuilds its reference automatically. Never patch
+`svgRef` manually or guess its storage URL. Image `fit` is explicitly `contain` or `cover`.
 - Name nodes uniquely; use returned IDs where names collide. Parent content to its
   frame so movement, selection, clipping and reviews can treat it as one artifact.
 - Give an intended stroke both `stroke` and `strokeWidth`. Zero explicitly removes it.

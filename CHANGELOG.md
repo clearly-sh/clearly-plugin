@@ -4,6 +4,20 @@ Notable changes to the plugin and the MCP surface it connects to.
 The surface is versioned separately from this repo — `initialize` reports it as
 `serverInfo.version`.
 
+## 0.8.7 — 2026-10-09
+
+### Plugin
+
+- `clearly-canvas`: start a design task with `design-start {title, projectId?, boardId?, idempotencyKey}` — it searches before creating, files the composition, links it to the ticket, and resumes from the same key after a partial failure.
+- `clearly-canvas`: read the brand and component library compactly (`brand-tokens {compact:true}`, `component-list {compact:true}`), and check `ignoredFields`, `rejectedFields`, `warnings`, `outcome` and `canvasChanges` on every edit — `matched` is not `updated`.
+- `clearly-canvas`: explicit `coordinateSpace:"world"|"parent"` for create/update geometry; large SVGs are stored by reference (`svgRef`) and rebuilt automatically when `svg` is replaced. `review.mjs` accepts intentional findings with `accept:[…]` and resumes creates without touching later edits.
+- `brand-identity`: match the requested scope — a logo concept delivers the editable mark, one-colour form and a small-size check; the full system (lockups, applications, guidelines) is for a full identity request.
+- Keeps Claude Code and Codex plugin manifests on the same version.
+
+### Surface
+
+- Works with MCP surface 3.0 and 3.1. `design-start` and the compact brand/component reads need the 2026-10-09 server release.
+
 ## 0.8.6 — 2026-10-07
 
 ### Plugin

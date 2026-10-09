@@ -22,6 +22,10 @@ stored. A rendered image you have inspected is the evidence for visual quality.
 For a small correction, keep the existing direction and make the smallest useful edit.
 For a new composition or substantial redesign, use the workflow below.
 
+Keep the requested scope. A landing concept with a logo needs its page layouts and a usable
+logo; add application boards or a full guideline system only when the brief calls for them.
+Read only relevant references. Save large tool responses once and print compact summaries.
+
 ## The studio bar — what "done" means, every time
 
 Load **`design-craft`** before any new visual work: grid, type scale, colour roles,
@@ -33,8 +37,9 @@ A composition is done when every requested artboard meets all four conditions:
 1. **`canvas.review` verdict is `clean` or `look`.** `fix` means a probable defect
    remains: text colliding or covered, contrast under WCAG (4.5:1 body, 3:1 display),
    type below the artboard's legible floor, missing media, text overflowing its box,
-   placeholder copy. Fix it. When it is deliberate, pass the check name or layer in
-   `ignore` and say why in the handoff.
+   placeholder copy. Fix it. For an intentional finding, use
+   `accept:[{check,ids:[node IDs],reason}]`. Accepted findings stay visible and return `look`.
+   Legacy `ignore` can suppress multiple checks and is not an unconditional pass.
 2. **Every `look` finding was looked at**: type-size and palette sprawl, near-miss
    alignment, copy against the trim, text over imagery. Act on it or say why not.
 3. **You inspected the rendered PNG** against design-craft's studio pass, covering what no
@@ -54,8 +59,8 @@ build from them — redrawing a button the library already has is how designs dr
 product they describe.
 
 ```sh
-beehaven call brand-tokens '{}'                                   # colours (light + dark), type roles, radius, logos, voice
-beehaven call component-list '{"query":"<brand or kind>"}'        # parts, with props, variants and the code they mirror
+beehaven call brand-tokens '{"compact":true}'                     # roles without repeated CSS/prose
+beehaven call component-list '{"query":"<kind>","compact":true}' # IDs, dimensions and prop names
 beehaven call component-instantiate '{"compositionId":"<id>","instances":[
   {"id":"<component>","x":96,"y":200,"variant":"Light"},
   {"id":"<component>","x":96,"y":280,"variant":"Light","props":{"label":"Save changes"}}]}'
@@ -68,8 +73,9 @@ beehaven call component-instantiate '{"compositionId":"<id>","instances":[
   `component-create` (or `{ fromCompositionId, nodeId }` to save one you drew).
 - Component node coordinates are relative to the component ROOT, even under an inner
   frame — the opposite of `canvas.create-node`, where x/y follow `parentId`.
-- If the workspace has a brand kit, it IS the system for the brief: use its roles, faces
-  and voice rather than inventing a palette. Change the brand itself only when asked.
+- For Clearly product UI, use its brand kit. For a separate client, use that client's kit
+  and supplied assets. A requested new client identity is scoped to that composition;
+  it does not change the workspace's default brand.
 
 **UX design before implementation.** When the work is a change to a product's UI, the
 composition is the design the code will answer to: show the real states (empty, loading,
@@ -106,6 +112,12 @@ beehaven agent login <name> --label "Design <artifact>" --client cli
 beehaven call canvas-perceive '{"compositionId":"<id>","format":"json"}'
 beehaven call canvas-catalog '{"query":"create-node"}'
 ```
+
+For a new design task, `design-start {title, projectId?, boardId?, idempotencyKey}` searches before
+creating and returns the linked ticket and composition in one call. Keep a stable idempotencyKey
+for retries. A partial failure returns recovery IDs; resume it rather than creating replacements.
+For an existing task, reuse its ticket/project. Check one unknown action with
+`beehaven explain <action>` or a filtered catalog; do not download the entire registry.
 
 Use the composition supplied by the user. If none is named, inspect recent titles and
 context; create a clearly titled composition for new work instead of modifying an
@@ -188,6 +200,10 @@ For a single page, establish the complete hierarchy before polishing small detai
 Use a batch for each coherent build or revision, with descriptive unique layer names.
 Parent content to its artboard. Inspect every operation result and rollback status.
 Save your builder and returned IDs so revisions are targeted and reproducible.
+Check `ignoredFields`, `rejectedFields`, `warnings`, `outcome` and `canvasChanges` as well as
+`ok/count`. `matched` is not `updated`. An unchanged or partly ignored request does not prove
+the intended edit happened. Read `composition-detail {includeScene:true}` from its top-level
+`nodes`; never treat a missing response field as an empty scene. Keep executed payloads immutable.
 
 ⚠ **Batch, never loop.** One `canvas-act` batch of hundreds of steps is one scene read,
 persisted every 50 steps, and the workspace stays responsive for everyone in it while it
@@ -225,6 +241,12 @@ It invokes `canvas.review` on one persisted snapshot and returns:
   type and palette sprawl, near-miss edges, trim crowding, text over imagery;
 - the placeholder/overflow audit, measured text fit, and a preview PNG.
 
+For several artboards, write their IDs/names as a JSON array and use:
+`node <skill-directory>/review.mjs --many <composition-id> <ids.json> <output-directory>`.
+This uses `canvas.review-many`: one scene read, separate findings per artboard and compact
+preview handles. Review only artboards changed since their verified snapshot. The helper versions
+existing output paths so before/after evidence is retained.
+
 The helper prints the verdict and every finding. Work until the verdict is `clean` or
 `look`, as described in the studio bar above. If the installed worker lacks `canvas.review`,
 use a real frame ID with `--perceive` for a preview-only check and run the text measurement
@@ -232,8 +254,15 @@ and audit separately. A failed or missing render means visual verification is in
 
 ```sh
 # A deliberate finding — say why in the handoff:
-beehaven call canvas-act '{"compositionId":"<id>","action":"canvas.review","args":{"ids":["<frame>"],"ignore":["text-over-image"]}}'
+beehaven call canvas-act '{"compositionId":"<id>","action":"canvas.review","args":{"ids":["<frame>"],"accept":[{"check":"text-over-image","ids":["<text-id>","<image-id>"],"reason":"Intentional type over this photograph; rendered contrast was inspected."}]}}'
 ```
+
+Asset storage is a reference-aware pipeline: an SVG may have `svgRef` instead of inline markup.
+Do not shrink or recreate it just because the inline field is absent. Replace it with
+`canvas.update-nodes {ids, patch:{svg:<complete markup>}}`; references are managed by the action.
+Use `canvas.fonts` before choosing an unfamiliar family/weight. Fallback metrics are not exact.
+Use `canvas.editor-state {requireLive:true,includePixels:true}` to verify the responding editor.
+An agent camera and a navigation delivery count do not prove the person's view was framed.
 
 Inspect the actual image and identify concrete defects, not generic praise:
 
