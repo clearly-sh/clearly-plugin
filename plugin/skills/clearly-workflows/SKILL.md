@@ -1,6 +1,7 @@
 ---
 name: clearly-workflows
 description: >-
+  Best with the beehaven CLI (semantic search and write-back); with only the Clearly connector, search with clearly_grep and record decisions with clearly_create.
   Use the Clearly workspace as a COMPANY BRAIN — search the org's accumulated
   context (decisions, facts, prompts, docs), write conclusions back so the next
   agent inherits them instead of re-deriving them, and inherit the team's

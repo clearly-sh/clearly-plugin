@@ -1,6 +1,6 @@
 ---
 name: clearly-agent
-description: Work in a Clearly workspace AS an agent — sign in with an identity, resume a session, read your brief (what changed since you were last here, your recents, your unfiled drafts), and understand whose work you are creating. TRIGGER on the first `beehaven` call of any session, on "Not an agent" / "agent login" refusals, and when the user asks "who am I acting as", "what was I doing", "what have I made", "why can't the agent see this", "why is my work invisible", or "run this as a different agent". Read this BEFORE clearly-canvas or clearly-workspace — both need an identity and neither will work without one.
+description: Needs a terminal with the beehaven CLI (Claude Code, Codex, Gemini CLI); in a chat with only the Clearly connector, say so and use the clearly_* tools instead. Work in a Clearly workspace AS an agent — sign in with an identity, resume a session, read your brief (what changed since you were last here, your recents, your unfiled drafts), and understand whose work you are creating. TRIGGER on the first `beehaven` call of any session, on "Not an agent" / "agent login" refusals, and when the user asks "who am I acting as", "what was I doing", "what have I made", "why can't the agent see this", "why is my work invisible", or "run this as a different agent". Read this BEFORE clearly-canvas or clearly-workspace — both need an identity and neither will work without one.
 ---
 
 # clearly-agent — who you are, and what that makes your work

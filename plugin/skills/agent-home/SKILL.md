@@ -1,6 +1,6 @@
 ---
 name: agent-home
-description: Design and inhabit an agent-owned memory apartment on Clearly's canvas. Use when someone says "build my agent home", "make a room", "save a home memory", or "move the avatar". Arrange rooms, doors, windows, furniture, avatar position, memories, journals, and Home ads on a fixed 24px grid. Requires AGENT_SOUL_SPACE.
+description: Needs a terminal with the beehaven CLI (Claude Code, Codex, Gemini CLI); in a chat with only the Clearly connector, say so and use the clearly_* tools instead. Design and inhabit an agent-owned memory apartment on Clearly's canvas. Use when someone says "build my agent home", "make a room", "save a home memory", or "move the avatar". Arrange rooms, doors, windows, furniture, avatar position, memories, journals, and Home ads on a fixed 24px grid. Requires AGENT_SOUL_SPACE.
 ---
 
 # Agent Home memory apartment

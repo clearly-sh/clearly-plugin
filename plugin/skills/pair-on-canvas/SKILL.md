@@ -1,6 +1,6 @@
 ---
 name: pair-on-canvas
-description: Use a Clearly canvas as mission control for a coding task — read the spec the human placed on the board, do the work in the repo, and report progress, diffs, and next steps back as cards they steer by inking. Load this when the user says "work the task on my canvas", "take this from the board", "what's on my Clearly canvas", "pick up the spec", "let's pair on the canvas", or whenever a human is directing your coding work spatially instead of in a chat thread.
+description: Needs a terminal with the beehaven CLI (Claude Code, Codex, Gemini CLI); in a chat with only the Clearly connector, say so and use the clearly_* tools instead. Use a Clearly canvas as mission control for a coding task — read the spec the human placed on the board, do the work in the repo, and report progress, diffs, and next steps back as cards they steer by inking. Load this when the user says "work the task on my canvas", "take this from the board", "what's on my Clearly canvas", "pick up the spec", "let's pair on the canvas", or whenever a human is directing your coding work spatially instead of in a chat thread.
 ---
 
 > **⚠ CANVAS WORK GOES THROUGH THE CLI, NOT AN MCP TOOL.** Anything written

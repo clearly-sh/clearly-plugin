@@ -1,6 +1,7 @@
 ---
 name: brand-identity
 description: >-
+  Needs a terminal with the beehaven CLI (Claude Code, Codex, Gemini CLI); in a chat with only the Clearly connector, say so and use the clearly_* tools instead.
   Design the requested logo or brand identity on a Clearly canvas —
   brief, mark, wordmark, lockups and clear space, palette, type system,
   applications, and a spec board someone else can build from. Use when asked

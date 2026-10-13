@@ -1,6 +1,6 @@
 ---
 name: codebase-map
-description: Walk a code repository and draw a living ARCHITECTURE MAP of it on a Clearly spatial canvas — modules as frames (sized by LOC, colored by layer), key files as nodes, imports/dependencies as arrows — so the big pieces, how they depend on each other, and where the complexity sits all read at a glance. Load this when the user says "map / diagram / visualize this codebase / repo / architecture", "how is this project structured", "draw the dependency graph", "give me an architecture overview", or when you're onboarding to an unfamiliar repo and need to see its shape fast.
+description: Needs a terminal with the beehaven CLI (Claude Code, Codex, Gemini CLI); in a chat with only the Clearly connector, say so and use the clearly_* tools instead. Walk a code repository and draw a living ARCHITECTURE MAP of it on a Clearly spatial canvas — modules as frames (sized by LOC, colored by layer), key files as nodes, imports/dependencies as arrows — so the big pieces, how they depend on each other, and where the complexity sits all read at a glance. Load this when the user says "map / diagram / visualize this codebase / repo / architecture", "how is this project structured", "draw the dependency graph", "give me an architecture overview", or when you're onboarding to an unfamiliar repo and need to see its shape fast.
 ---
 
 > **⚠ CANVAS WORK GOES THROUGH THE CLI, NOT AN MCP TOOL.** Anything written

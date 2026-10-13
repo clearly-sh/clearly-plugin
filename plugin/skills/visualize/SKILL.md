@@ -1,6 +1,6 @@
 ---
 name: visualize
-description: Turn any concept, answer, or described system into a clean DIAGRAM on a Clearly spatial canvas instead of a wall of text. Load this when the user asks to "diagram this", "draw it", "sketch it", "map it out", "visualize this",
+description: Needs a terminal with the beehaven CLI (Claude Code, Codex, Gemini CLI); in a chat with only the Clearly connector, say so and use the clearly_* tools instead. Turn any concept, answer, or described system into a clean DIAGRAM on a Clearly spatial canvas instead of a wall of text. Load this when the user asks to "diagram this", "draw it", "sketch it", "map it out", "visualize this",
   "explain visually", "show me how X works", "flowchart this", "make a diagram" — AND proactively whenever YOUR OWN answer would be clearer as a picture than a paragraph (a flow with branches, who-calls-whom, a schema, an architecture, options on axes). Picks the right diagram type for the content and builds it with the canvas primitives.
 ---
 

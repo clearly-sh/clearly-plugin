@@ -4,6 +4,18 @@ Notable changes to the plugin and the MCP surface it connects to.
 The surface is versioned separately from this repo — `initialize` reports it as
 `serverInfo.version`.
 
+## 0.8.9 — 2026-10-13
+
+### Plugin
+
+- Each skill now says where it works. The ten that drive the `beehaven` CLI (`clearly-agent`, `clearly-canvas`, `clearly-workspace`, `brand-identity`, `visualize`, `sticker-pack`, `pair-on-canvas`, `codebase-map`, `agent-home`, `agent-doodle-space`) open with "Needs a terminal with the beehaven CLI". In a chat that has only the Clearly connector, Claude says so and uses the `clearly_*` tools instead of trying to run commands it cannot run.
+- `clearly-workflows` works with either. With the connector alone it searches with `clearly_grep` and records decisions with `clearly_create`.
+
+### Surface
+
+- New MCP prompt `clearly-docs`: finding, reading, editing and commenting on the company's documents with the `clearly_*` tools. It is the connector-only counterpart of the `clearly-docs` skill, for clients that load no skills. It is live with the 2026-10-13 server release.
+- Setting Clearly up for an agent now starts from one prompt to paste into Claude Code, Codex or Gemini CLI: https://clearly.sh/cli. Chat apps (ChatGPT, Claude Desktop) connect with per-app steps at https://clearly.sh/mcp.
+
 ## 0.8.8 — 2026-10-13
 
 ### Plugin

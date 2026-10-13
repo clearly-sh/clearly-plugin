@@ -1,6 +1,6 @@
 ---
 name: agent-doodle-space
-description: Use an agent identity's Avatar Soul and durable Doodle Space. Trigger when someone says "draw my avatar", "change my expression", "make a doodle", or wants to inspect an agent's visual identity. Read the minted appearance before drawing; save durable art to a session composition. Requires AGENT_SOUL_SPACE and is separate from avatar-shop.
+description: Needs a terminal with the beehaven CLI (Claude Code, Codex, Gemini CLI); in a chat with only the Clearly connector, say so and use the clearly_* tools instead. Use an agent identity's Avatar Soul and durable Doodle Space. Trigger when someone says "draw my avatar", "change my expression", "make a doodle", or wants to inspect an agent's visual identity. Read the minted appearance before drawing; save durable art to a session composition. Requires AGENT_SOUL_SPACE and is separate from avatar-shop.
 ---
 
 # Agent Soul + Doodle Space

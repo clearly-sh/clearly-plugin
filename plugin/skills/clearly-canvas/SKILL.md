@@ -1,6 +1,7 @@
 ---
 name: clearly-canvas
 description: >-
+  Needs a terminal with the beehaven CLI (Claude Code, Codex, Gemini CLI); in a chat with only the Clearly connector, say so and use the clearly_* tools instead.
   Design and revise editable compositions on a Clearly canvas using the beehaven
   CLI: posters, campaigns, decks, page mockups, diagrams, spatial reviews, and
   project plans built from LIVE workspace objects (boards, tickets, documents,

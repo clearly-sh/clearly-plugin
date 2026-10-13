@@ -1,6 +1,6 @@
 ---
 name: sticker-pack
-description: Turn an idea into a printable, die-cut STICKER SHEET on a Clearly canvas — Clearly's own sticker-vending-machine pipeline surfaced as an agent skill. Generates a cohesive SET of transparent stickers, lays them out as a sheet (frame + gridded stickers + a vector kiss-cut cutline layer), and hands back a print-ready bundle. Load this when the user says "make me stickers / a sticker pack / a sticker sheet about X", "turn this into stickers", "design stickers for my brand / startup / cat", or "I want die-cut stickers". The fun, inherently-shareable corner of the canvas skill set.
+description: Needs a terminal with the beehaven CLI (Claude Code, Codex, Gemini CLI); in a chat with only the Clearly connector, say so and use the clearly_* tools instead. Turn an idea into a printable, die-cut STICKER SHEET on a Clearly canvas — Clearly's own sticker-vending-machine pipeline surfaced as an agent skill. Generates a cohesive SET of transparent stickers, lays them out as a sheet (frame + gridded stickers + a vector kiss-cut cutline layer), and hands back a print-ready bundle. Load this when the user says "make me stickers / a sticker pack / a sticker sheet about X", "turn this into stickers", "design stickers for my brand / startup / cat", or "I want die-cut stickers". The fun, inherently-shareable corner of the canvas skill set.
 ---
 
 > **⚠ CANVAS AND STICKER WORK GO THROUGH THE CLI, NOT AN MCP TOOL.** Anything written
