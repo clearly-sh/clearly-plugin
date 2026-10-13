@@ -4,6 +4,20 @@ Notable changes to the plugin and the MCP surface it connects to.
 The surface is versioned separately from this repo — `initialize` reports it as
 `serverInfo.version`.
 
+## 0.8.8 — 2026-10-13
+
+### Plugin
+
+- Draw like a designer: `clearly-canvas`, `brand-identity`, `visualize` and `sticker-pack` build marks, icons, illustrations, diagrams and stickers from native canvas layers. That means frames, `rect`/`ellipse`, `vector.create` pen paths, text and groups, named and in brand colours, so every part stays editable. An `svg` node with raw markup is still supported, but only for importing an existing file or an SVG the person asked for.
+- `clearly-canvas/authoring.md` carries the same **Technique** rules the in-app assistant works to (`canvas-catalog` returns them as `technique`): auto layout, gradients, shadows and blur, drawing, placeholders and sections.
+- `clearly-agent`: a workspace with no brand imports it from the company's site. Run `brand-import {url, dryRun:true}` first, ask what to call the brand, then save it with `name`.
+- `design-craft`: the design shelf. `references.md` lists about fifty books on grid, type, print, colour, identity, information and interface design, each reduced to one rule, to cite in Research and Direction.
+- Keeps Claude Code and Codex plugin manifests on the same version.
+
+### Surface
+
+- Works with MCP surface 3.x. With the 2026-10-13 server release, `canvas.group` makes a Figma-style group layer: it hugs its layers, and moving or resizing it carries them. Previously it made a frame. Older ⌘G groups read as group layers.
+
 ## 0.8.7 — 2026-10-09
 
 ### Plugin

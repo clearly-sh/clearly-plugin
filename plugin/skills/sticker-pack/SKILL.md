@@ -119,7 +119,7 @@ A real die-cut pack — transparent stickers, a visible kiss-cut contour, a prin
 
 ## Single-sticker fallback
 
-For ONE sticker (not a sheet) use `studio-image-generate` (raster or `format:'svg'` for a cut-ready vector) and place it with `canvas-act`. If `sticker-sheet-gen` is ever unavailable, the manual sheet = `studio-image-generate` per concept (transparent), then `canvas-act` → `frame.create` + one `canvas.create-node {type:'image'}` per sticker on a grid + a `canvas.create-node {type:'svg'}` cutline outline. But that's the cold path — the pipeline above is the real, supported one.
+For ONE vector sticker (not a sheet), draw it natively with `canvas-act` like a designer: shapes and `vector.create` pen paths in a frame, named and grouped, with the white border as its own closed path behind the art. Use `studio-image-generate` for a painterly raster sticker, and `format:'svg'` only when a generated SVG file is asked for. If `sticker-sheet-gen` is ever unavailable, the manual sheet = `studio-image-generate` per concept (transparent), then `canvas-act` → `frame.create` + one `canvas.create-node {type:'image'}` per sticker on a grid + a closed `vector.create` cutline outline. But that's the cold path — the pipeline above is the real, supported one.
 
 ## Rules of thumb
 

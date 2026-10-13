@@ -69,7 +69,7 @@ Chain more boxes at `x += 260` per step. Branch (e.g. "budget exhausted → top-
 
 ## Recipe: Flowchart / process
 
-**Layout:** boxes top→down (or left→right), **rounded rect = action**, **diamond = decision**. Draw a diamond as a `type:"svg"` rhombus; give it two outgoing arrows labelled **Yes / No**.
+**Layout:** boxes top→down (or left→right), **rounded rect = action**, **diamond = decision**. Draw a diamond natively as a closed `vector.create` rhombus (4 points: top, right, bottom, left); give it two outgoing arrows labelled **Yes / No**.
 
 ```jsonc
 canvas-act { "compositionId":"c_…", "batch":[
@@ -103,7 +103,7 @@ Place the message text just above its arrow. A return/response arrow points back
 
 ## Recipe: Architecture / system diagram
 
-**Layout:** each service is a `frame` (so it can hold a label + sub-parts); **data stores are cylinders** drawn as `type:"svg"`; arrows are calls. Cluster by tier — a row of frames per tier (client / edge / data), with a faint heading text per row.
+**Layout:** each service is a `frame` (so it can hold a label + sub-parts); **data stores are cylinders** drawn natively (a `rect` body with an `ellipse` cap on top and one behind at the bottom, grouped with `canvas.group`); arrows are calls. Cluster by tier — a row of frames per tier (client / edge / data), with a faint heading text per row.
 
 ```jsonc
 canvas-act { "compositionId":"c_…", "batch":[
@@ -137,7 +137,7 @@ Rules: PK/FK noted in the field text, one relationship line per FK, cardinality 
 
 ## Recipe: Mind-map
 
-**Layout:** one central node (an `ellipse` or pill `rect`), child topics radiating out, each connected by a **curved** branch (a `<path>` inside a `type:"svg"`, not a straight line). Place children evenly around the center; second-level topics hang off their parent.
+**Layout:** one central node (an `ellipse` or pill `rect`), child topics radiating out, each connected by a **curved** branch (an open `vector.create` pen path with `hIn`/`hOut` control points, not a straight line). Place children evenly around the center; second-level topics hang off their parent.
 
 ```jsonc
 canvas-act { "compositionId":"c_…", "batch":[
@@ -145,8 +145,8 @@ canvas-act { "compositionId":"c_…", "batch":[
   { "action":"canvas.create-node", "args":{ "type":"text", "name":"coret", "text":"Company Brain", "x":250, "y":190, "size":15, "fontWeight":700, "fill":"#e9defb" } },
   { "action":"canvas.create-node", "args":{ "type":"rect", "name":"c1", "x":480, "y":60, "w":150, "h":48, "fill":"#1b2230", "stroke":"#3a465c", "radius":24 } },
   { "action":"canvas.create-node", "args":{ "type":"text", "name":"c1t", "text":"Org context", "x":500, "y":76, "size":13, "fontWeight":600, "fill":"#e8edf5" } },
-  { "action":"canvas.create-node", "args":{ "type":"svg", "name":"core→c1", "x":380, "y":84, "w":100, "h":110,
-    "svg":"<svg viewBox='0 0 100 110'><path d='M2,108 C50,108 50,8 98,8' fill='none' stroke='#7b5cc4' stroke-width='2'/></svg>" } }
+  { "action":"vector.create", "args":{ "name":"core→c1", "closed":false, "stroke":"#7b5cc4", "strokeWidth":2,
+    "points":[ { "x":382, "y":192, "hOut":{ "x":430, "y":192 } }, { "x":478, "y":92, "hIn":{ "x":430, "y":92 } } ] } }
 ]}
 ```
 

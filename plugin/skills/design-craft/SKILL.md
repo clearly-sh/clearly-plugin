@@ -298,6 +298,11 @@ fewer elements, tighter type, one accent*. Every ornament added is a step away f
 
 ## Sources
 
+The full shelf — about fifty books across grid, type, print production, colour, graphic form,
+brand identity, information and interface design, each reduced to one rule — is in
+[references.md](references.md). In Research pick two or three whose lens fits the brief, and name
+the one behind each direction in its rationale.
+
 Josef Müller-Brockmann, *Grid Systems in Graphic Design* (1981) · Massimo Vignelli, *The
 Vignelli Canon* (semantics / syntactics / pragmatics; "Design is one") · Michael Bierut,
 *How to* (Pentagram; brief → rationale → trade-offs) · Paula Scher / Pentagram, The Public

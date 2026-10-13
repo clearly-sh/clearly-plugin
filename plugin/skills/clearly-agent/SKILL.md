@@ -190,6 +190,19 @@ task changes a product's UI, the composition comes FIRST: build the screen and i
 `canvas.review` it, link it to the ticket (`work-link {ticketId, kind:"design", refKind:"composition",
 refId}`), then implement. `clearly-canvas` §0 has the details.
 
+No brand yet (`brand-tokens` answers `brand-not-found`) for a real company? Ask the person for their
+website rather than inventing a palette, then:
+
+1. `beehaven call brand-import '{"url":"theirsite.com","dryRun":true}'` — colours by role, faces, logos,
+   voice and shape, each with its reason in `provenance`. Tell the person what you read.
+2. Ask what to call the brand (`suggestedName` is what the site calls itself — a suggestion, not a default).
+3. `beehaven call brand-import '{"url":"theirsite.com","name":"<their answer>"}'` saves it (the read is
+   reused; the first brand becomes the workspace default). Without `name` nothing is saved:
+   `brand-name-required`.
+
+`brandId` + `apply:["colors","type"]` refreshes an existing brand as a new version instead. Licensed faces
+come back set in the closest free one — `faces` says which.
+
 ## When a write is refused
 
 `agent-denied-create` / `-update` / `-delete` mean your **capability matrix** said no. It covers the

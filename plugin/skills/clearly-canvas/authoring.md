@@ -119,8 +119,19 @@ and tokens when relevant. Constraints reflow children on frame resize; they do n
 a static canvas into a responsive website. Design explicit mobile artboards when the
 deliverable requires them, with content order and hierarchy reconsidered for the width.
 
+## Technique
+
+The same rules the in-app assistant works to (canvas-catalog returns them as `technique`).
+
+- AUTO-LAYOUT: rows and stacks (nav links, button groups, card rows, form fields) are a frame whose children you create in reading order, then canvas.auto-layout { id, direction, gap, padding, align, justify, hug }. hug:false keeps the frame size, which a full-width bar needs with justify:"space-between"; set a child to layoutSizingH/V "fill" | "hug" | "fixed" with canvas.update-nodes. The frame stays live: create more children into it (parentId) and they flow in; layoutPositioning:"absolute" takes one out of the flow.
+- GRADIENTS: gradient { kind, angle, stops: [{ offset, color }] } replaces the solid fill. angle is the direction the colour travels: 0 = left to right, 90 = top to bottom, 45 = top-left to bottom-right (not CSS degrees). Use two or three stops from the brand palette, and keep text off a busy gradient or check its contrast in canvas.review.
+- SHADOWS AND BLUR: effects on any node. A soft card shadow is { type: "drop-shadow", x: 0, y: 4, blur: 16, spread: 0, color: "#0000001F" }; frosted glass is { type: "background-blur", blur: 16 }. Never fake a shadow with an extra rectangle.
+- DRAWING: build every mark, icon, illustration and diagram shape from native layers, as a designer does in Figma, never as one generated SVG file. Primitives are canvas.create-node rect and ellipse; curves are pen paths, vector.create { name, parentId, points: [{ x, y, hIn?: { x, y }, hOut?: { x, y } }], closed, fill or stroke, strokeWidth }, where hIn/hOut are absolute control points: use few anchors with smooth handles, and refine with vector.read, vector.vertex.move and vector.handle.set. Round caps and joins: canvas.update-nodes patch { strokeCap: "round", strokeJoin: "round" }. Work back to front: ground, big silhouettes in flat brand colours, then features, then details and highlights; check the silhouette in canvas.review before detailing. Name layers by part ("fox/ear-left"), group each figure with canvas.group { ids, name } and set overlap with canvas.order { ids, op }. Make a cut-out by layering a ground-colour shape on top; vector.boolean { op } on selected paths needs an open editor. Keep one stroke weight per drawing. Photographic or painterly imagery is a placed raster. Raw SVG stays supported but is never the default: when an SVG is asked for, write the markup yourself as an svg node, canvas.create-node { type: "svg", name, w, h, svg } with <svg viewBox="0 0 W H"> matching w and h, or import existing markup the same way; never an SVG generation pipeline.
+- PLACEHOLDERS: until real imagery exists, draw a native placeholder at the final size in a muted brand tone, never a flat accent block: a rect with the slot radius plus a simple motif (an ellipse sun, a vector.create mountain), grouped with canvas.group and named "<section> image placeholder", with any label in its own text node.
+- SECTIONS: one frame per page section, named exactly as its ticket says, inside the page artboard. Build a section in one canvas-act batch that ends with canvas.review of the artboard and carries ticket: { id: "<its key>", status: "done", resolution: "<what changed>" }. The ticket moves only when that review is clean or look; result.ticket says whether it did. Then start the next section.
+
 Use `arrow.create {from,to,routing,label}` for connected diagrams, so arrows remain bound
-when nodes move. Use native shapes and SVG for custom vector details. Keep labels as
+when nodes move. Draw custom vector details natively (shapes, vector.create pen paths); raw SVG only imports an existing file. Keep labels as
 native text so they remain editable and measurable.
 
 Use `canvas.place {kind,id,x,y,w,h,name,parentId?}` to put a workspace object (document,

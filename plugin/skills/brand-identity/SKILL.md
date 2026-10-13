@@ -64,15 +64,31 @@ handover. A mark of hand-placed béziers does not, and it shows.
 | **Counter-form** | the shape is the NEGATIVE space between forms | clever marks that survive one colour |
 | **Modular** | one unit repeated/rotated on a grid | systems, networks, collectives |
 
-**Build it as an `svg` node with a stated viewBox and derived numbers:**
+**Build it from native layers, every number derived from the construction** — the way an
+identity designer works in Figma, so each part of the mark stays a named, editable layer in the
+brand colour (never one generated or hand-written SVG):
 
 ```jsonc
-{"action":"canvas.create-node","args":{"name":"mark","type":"svg","x":120,"y":120,"w":240,"h":240,
- "svg":"<svg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'>…</svg>"}}
+{"batch":[
+ {"action":"frame.create","args":{"name":"Mark","x":120,"y":120,"w":240,"h":240}},
+ {"action":"canvas.create-node","args":{"type":"ellipse","name":"mark/ring","parentId":"Mark",
+   "x":20,"y":20,"w":200,"h":200,"fill":"#1B4DFF"}},
+ {"action":"canvas.create-node","args":{"type":"ellipse","name":"mark/counter","parentId":"Mark",
+   "x":70,"y":70,"w":100,"h":100,"fill":"#FFFFFF"}},
+ {"action":"vector.create","args":{"name":"mark/blade","parentId":"Mark","closed":true,"fill":"#1B4DFF",
+   "points":[{"x":120,"y":20},{"x":220,"y":120},{"x":120,"y":120}]}},
+ {"action":"canvas.group","args":{"ids":["mark/ring","mark/counter","mark/blade"],"name":"mark"}}
+]}
 ```
 
-⚠ **`<text>` inside an `svg` node does NOT render headlessly** — no system fonts are loaded.
-Wordmarks are real text nodes, or outlined paths. Never live `<text>` in the mark.
+Here R = 100: the counter is R/2, the blade's corners sit on the circle. Curves are
+`vector.create` points with `hIn`/`hOut` control points (absolute coordinates) placed where the
+construction says; a quarter-circle's handle sits 0.552·R from its anchor. A counter-form is a
+ground-colour shape layered on top; `vector.boolean` makes a true cut-out when an editor is open.
+Raw SVG (`type:"svg"`) is only for importing a mark the client already has.
+
+⚠ **Wordmarks are real text nodes, or outlined paths** — and `<text>` inside an imported `svg`
+node does NOT render headlessly (no system fonts are loaded).
 
 **Test the mark against these before going further. A mark that fails any of them is not done:**
 

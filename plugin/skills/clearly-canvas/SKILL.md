@@ -60,6 +60,7 @@ product they describe.
 
 ```sh
 beehaven call brand-tokens '{"compact":true}'                     # roles without repeated CSS/prose
+beehaven call brand-import '{"url":"theirsite.com","dryRun":true}' # no brand yet? read it off their website
 beehaven call component-list '{"query":"<kind>","compact":true}' # IDs, dimensions and prop names
 beehaven call component-instantiate '{"compositionId":"<id>","instances":[
   {"id":"<component>","x":96,"y":200,"variant":"Light"},
@@ -109,13 +110,43 @@ can read and edit artifact records, while canvas-specific actions use the CLI.
 beehaven env
 beehaven connect home
 beehaven agent login <name> --label "Design <artifact>" --client cli
-beehaven call canvas-perceive '{"compositionId":"<id>","format":"json"}'
+beehaven call canvas-perceive '{"compositionId":"<id>","outline":true}'
 beehaven call canvas-catalog '{"query":"create-node"}'
 ```
 
-For a new design task, `design-start {title, projectId?, boardId?, idempotencyKey}` searches before
-creating and returns the linked ticket and composition in one call. Keep a stable idempotencyKey
-for retries. A partial failure returns recovery IDs; resume it rather than creating replacements.
+Read a canvas the way you read a repository: `canvas-perceive {outline:true}` is `tree` (artboards,
+sections, layer counts, first copy, EMPTY sections — a few hundred bytes); `{frame:"<id or name>"}`
+opens one frame like a file (its layers indented, positions relative to their parent);
+`{find:"Start free"}` is `grep` (copy, layer names or `#hex`, with each match's frame path). Use
+`format:"json"` only when you need every field of every node. Every `canvas-act` write returns
+`diagnostics` — a lint of the artboards it touched (text overflow, collisions, covered text,
+contrast) — treat them like compiler errors and fix them in the next batch. `canvas.review` is still
+the pixel check and the ticket gate.
+
+A canvas is planned like a git repository: its own plan board, a WORK TICKET for the request, and
+COMMITS — one ticket per coherent layer or section of a larger change.
+`design-start {title, brandId?}` makes a PRIVATE DRAFT canvas, bound to the brand, with its private
+plan board and the work ticket, and returns `{ compositionId, ticketId, ticketKey, boardId, brand }`.
+Same title again returns the same draft. Nothing is shared until it is filed:
+`design-file {compositionId, projectId | projectTitle}` moves the canvas — plan board and every
+ticket with it — into the project the person chose and sends the work ticket to in-review. Ask which
+project unless they named one; a close-but-different title answers `similar-projects` with
+candidates. Repeat-safe.
+Plan a larger change before drawing, the way you would split a big code change into commits:
+`design-plan {compositionId, commits: ["Grid, type and colour styles", "Nav", "Hero", …]}` (drafts
+and filed canvases alike) adds ordered commit tickets under the work ticket. `sections: true` uses
+the landing-page set (set up frames and styles, nav bar, hero, highlights, offer, story, call to
+action, footer, mobile, states); `phases: true` and a `brief` add the studio method (brief, research,
+structure, direction, design, review) — load the `design-process` skill. Order commits so each
+builds on the last and can be reviewed alone. Build ONE commit per canvas-act batch that ends with
+`canvas.review` of the artboard and carries
+`"ticket":{"id":"<key>","status":"done","resolution":"<what changed>"}` — it lands only if that
+review is clean or look; `result.ticket` says whether it did, and the ticket logs the canvas
+revision and the layers the commit changed. Auto-layout, gradients, shadows, drawing and placeholders:
+see "Technique" in [authoring.md](authoring.md).
+
+`composition-board-get {compositionId}` reads the plan back. `design-start` with a project, ticket or
+`phases` still sets up planned work directly (kept for one release).
 For an existing task, reuse its ticket/project. Check one unknown action with
 `beehaven explain <action>` or a filtered catalog; do not download the entire registry.
 
@@ -173,8 +204,11 @@ hand-author hundreds of coordinates in a chat message.
   Check contrast on the actual ground. Use the user's real brand assets.
 - Choose relevant imagery, a meaningful diagram, a product view or a deliberate
   typographic treatment. Decorative blobs and random stock photos do not prove a
-  product claim. Native SVG/paths suit diagrams and vector art; raster generation
-  suits imagery when an image tool is available.
+  product claim. Draw marks, icons, illustrations and diagrams yourself from native
+  layers (shapes, vector.create pen paths, text, groups), the way a designer works in
+  Figma, so every part stays named and editable. Raster generation suits photographic
+  imagery when an image tool is available. Raw SVG (an svg node, or a generated SVG)
+  is for importing an existing file or a requested SVG, never the default.
 - Define repeated components once. Vary composition where the content changes.
   A deck of identical cards has little rhythm even when every card aligns.
 - Keep important copy and layers editable. Do not flatten the whole composition
