@@ -20,6 +20,13 @@ The deliverable is a composition that communicates a specific idea at its intend
 viewing size, with editable, well-named layers. Successful RPCs prove that nodes were
 stored. A rendered image you have inspected is the evidence for visual quality.
 
+Use the same working method as a designer in Figma: artboards, named editable layers,
+text styles, reusable components, auto-layout and constraints; explicit responsive states;
+then inspect the pixels and refine. Read `authoring.md` and discover the current catalog
+before assuming an operation is missing. Typography defaults to Auto; use `140%` or `24px`
+for explicit line heights. Keep unsupported capabilities and unverified rendering visible
+in the handoff; a familiar workflow does not prove every Figma feature is implemented.
+
 For a small correction, keep the existing direction and make the smallest useful edit.
 For a new composition or substantial redesign, use the workflow below.
 
@@ -33,7 +40,7 @@ Load **`design-craft`** before any new visual work: grid, type scale, colour rol
 spacing, optical correction, the studio pass. It ships beside this skill; `layout-systems`
 covers multi-artboard grids. This skill covers the canvas mechanics.
 
-A composition is done when every requested artboard meets all four conditions:
+A composition is done when every requested artboard meets all five conditions:
 
 1. **`canvas.review` verdict is `clean` or `look`.** `fix` means a probable defect
    remains: text colliding or covered, contrast under WCAG (4.5:1 body, 3:1 display),
@@ -48,6 +55,12 @@ A composition is done when every requested artboard meets all four conditions:
    one accent, orphans, consistency.
 4. **The first read works at delivery size.** At thumbnail size, the thing that should
    win does win.
+5. **The document behaves as a design.** Inspect its frame tree: sections and UI containers
+   own their contents and background fills; rows, stacks and grids use live auto layout
+   with deliberate Hug/Fill/Fixed sizing. Resize a representative container and lengthen
+   its copy on a duplicate, then verify reflow and containment. Keep intentional artwork
+   positioned inside named artwork frames. Record these checks separately from visual QA;
+   `canvas.review` does not prove hierarchy or reflow.
 
 A new composition almost always needs at least one revision after its first render. If
 the pass finds nothing, look again at the thumbnail. If there is still nothing, say what

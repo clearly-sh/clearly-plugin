@@ -4,6 +4,12 @@ Notable changes to the plugin and the MCP surface it connects to.
 The surface is versioned separately from this repo — `initialize` reports it as
 `serverInfo.version`.
 
+## 0.8.10 — 2026-10-15
+
+- Refresh canvas authoring, auto layout, text sizing, design craft, layout systems, and agent identity guidance from the workspace source.
+- Add photo editing, print production, and social post skills.
+- Keep Claude Code and Codex manifests on the same version.
+
 ## 0.8.9 — 2026-10-13
 
 ### Plugin

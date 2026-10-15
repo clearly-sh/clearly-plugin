@@ -47,7 +47,7 @@ that lost one. If you have four items, ask whether one is really a different thi
 ```
 margin 8–10% of the short edge      (1080 → 88–108; A3 → 280–350)
 display 12–20% of the HEIGHT        (1350 → 160–270px), weight 700–900, tracking −3 to −6,
-                                     lineHeight 0.92–1.0
+                                     lineHeight "92%"–"100%"
 supporting 2–3% of height           credits, date, venue — deliberately small
 ```
 
@@ -105,7 +105,7 @@ content column ≤ 1200 even though the slide is 1920
 ## Landing page / hero — 1440 wide (design), content max 1200
 
 ```
-margin 96 · headline 64–88 (tracking −2, lineHeight 1.05) · sub 20–24 muted, w ≤ 640
+margin 96 · headline 64–88 (tracking −2, lineHeight "105%") · sub 20–24 muted, w ≤ 640
 CTA 48–56 tall, 24–32 horizontal padding · section spacing 96–160 vertical
 ```
 
@@ -124,7 +124,7 @@ CTA 48–56 tall, 24–32 horizontal padding · section spacing 96–160 vertica
 
 ```
 margin: outer 10%, inner (gutter side) 12–14% — asymmetric, because the binding eats it
-columns 2–3 for A4 body · measure 45–75ch · body 10–11pt (≈42–46px at 300dpi), lineHeight 1.45
+columns 2–3 for A4 body · measure 45–75ch · body 10–11pt (≈42–46px at 300dpi), lineHeight "145%"
 ```
 
 - **Asymmetric margins are the mark of real editorial.** Equal margins all round read as a
@@ -141,9 +141,9 @@ columns 2–3 for A4 body · measure 45–75ch · body 10–11pt (≈42–46px a
 ## Cards, tables and dense UI
 
 - **Card padding 24–32, radius 10–16, gap between cards ≥ 2× padding.**
-- ⚠⚠ **BACKGROUND FIRST, LABEL SECOND.** Later nodes draw over earlier ones — create the
-  card rect, THEN its text. Reversed, the opaque fill hides the label and you get the classic
-  "grid of cards with no text".
+- **Cards are filled frames.** Parent labels, icons and controls to the card; use auto
+  layout for its content. Build rows and grids from these cards, with deliberate
+  Hug/Fill/Fixed sizing. Reserve rectangles for decorative shapes, swatches and rules.
 - **In tables, align numbers RIGHT and use tabular figures.** Left-aligned numbers of
   different lengths cannot be compared, which is the only reason the table exists.
 - **Zebra striping OR rules, never both.** Ideally neither — space is enough at ≥12px row padding.
@@ -153,10 +153,13 @@ columns 2–3 for A4 body · measure 45–75ch · body 10–11pt (≈42–46px a
 ## Building it on the canvas
 
 ```jsonc
-// ONE batch. Frames first, then children with parentId (x/y RELATIVE to the frame).
-{"action":"frame.create","args":{"name":"poster","x":200,"y":300,"w":1080,"h":1350,"fill":"#111111"}}
-{"action":"canvas.create-node","args":{"name":"headline","type":"text","parentId":"poster",
-  "x":88,"y":900,"w":904,"text":"…","size":180,"fontWeight":800,"letterSpacing":-5,"lineHeight":0.95}}
+// ONE batch. A content stack owns its fill and children; the layout computes positions.
+{"action":"frame.create","args":{"id":"card","name":"Feature card","w":360,"h":200,"fill":"#FFFFFF"}}
+{"action":"canvas.create-node","args":{"name":"Feature title","type":"text","parentId":"card",
+  "w":312,"text":"Make room for the idea","size":28,"fontWeight":600,"lineHeight":"auto"}}
+{"action":"canvas.create-node","args":{"name":"Feature detail","type":"text","parentId":"card",
+  "w":312,"text":"Keep every layer ready for the next edit.","size":16,"lineHeight":"145%"}}
+{"action":"canvas.auto-layout","args":{"id":"card","direction":"v","gap":16,"padding":24,"sizingH":"fixed","sizingV":"hug"}}
 ```
 
 - ⚠ **Omit `h` on text** — it hugs its wrapped content. Pin `h` only when a later element's
@@ -180,5 +183,5 @@ columns 2–3 for A4 body · measure 45–75ch · body 10–11pt (≈42–46px a
 | Deck | too many words; title states the topic instead of the argument; full-width text |
 | Landing | subhead runs full width; two competing CTAs; sections evenly spaced |
 | Editorial | symmetric margins; no baseline grid; unbroken columns |
-| Cards | text created before its background; gaps equal to padding so groups do not read |
+| Cards | background and contents lack a shared frame; layout breaks when copy grows |
 | **All** | **an exact 50/50 split, and four type sizes where three would do** |

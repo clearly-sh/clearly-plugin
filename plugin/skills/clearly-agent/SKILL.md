@@ -216,6 +216,11 @@ governance. Each resource's delete cell is `none`, `own`, or `all`; `own` means 
 `created_by: agent:<your-id>`. Missing or legacy author data is not yours. Permanent deletion is
 human-only; agent deletes use a recoverable archive, tombstone, or checkpoint.
 
+Removing canvas layers is an **update**, including `canvas.delete`, block removal, and placed
+design layers. You may remove layers from any visible canvas within your edit scope, regardless
+of its author. The server requires an undo checkpoint first. Deleting or archiving the whole
+canvas still follows delete-own/delete-all (CAN2-128).
+
 Only agents whose owner is currently a workspace owner or admin can use admin or delete-all. The
 server checks this on every call: if your owner is demoted, your scope drops to write/delete-own.
 After an owner is promoted again, a human must explicitly re-grant the higher scope.
@@ -228,15 +233,17 @@ owner/admin-owned agent can be granted it. Check yours before a destructive step
 beehaven call agent-capabilities-get '{}'     # { scope, matrix, summary }
 ```
 
-⚠ `permission_scope: 'write'` lets you delete only your own work. A refusal on another author's
-item is the contract working, not a bug. ⚠ You cannot change permissions — yours or another agent's;
+⚠ `permission_scope: 'write'` lets you archive/remove only your own workspace items; editing layers
+inside an editable canvas follows the update rule above. A permission refusal is the contract
+working, not a bug. ⚠ You cannot change permissions — yours or another agent's;
 ask the owner.
 
 ## Traps that cost real time
 
 - ⚠ **`beehaven env` first.** `prod` and `staging` are different databases and `--env` does not
   exist on `call` — the daemon *is* the env. Every number is meaningless if you are on the wrong one.
-- ⚠ **A deploy does not reach a resident DO.** `beehaven stop && sleep 15 && beehaven start --headless`.
+- ⚠ **Verify a deploy by the response's runtime version.** Allow propagation and retry read-only
+  checks; do not restart the user's daemon to force a resident DO onto a new version.
 - ⚠⚠ **Check the `as <agent>` on your first call.** An identity archived in this workspace still
   mints (identities are account-level), but the workspace refuses its session. Current CLIs say so
   (`⚠ Signed in, but this workspace refused …`, exit 1) and then refuse every call as that

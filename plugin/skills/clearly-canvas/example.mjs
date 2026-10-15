@@ -1,78 +1,81 @@
 #!/usr/bin/env node
-/** Example of a reusable native-node builder. Writes JSON only; it never calls a workspace. */
+/** Three editable page states. Writes JSON only; it never calls a workspace. */
 import { writeFileSync } from 'node:fs';
 
 const [compositionId, output = '/tmp/fieldwork-build.json'] = process.argv.slice(2);
 if (!compositionId) throw new Error('Usage: node example.mjs <composition-id> [output.json]');
-const grid = { w: 1440, h: 900, margin: 88, gutter: 80 };
-const ink = '#172824', paper = '#F2F0E7', orange = '#C84A2E', muted = '#58685E';
 const batch = [];
 const op = (action, args) => batch.push({ action, args });
-const frame = (name, index, fill) => op('frame.create', {
-  id: name, name, x: index * (grid.w + grid.gutter), y: 0, w: grid.w, h: grid.h, fill,
-});
-const node = (parentId, name, type, x, y, w, h, props) => op('canvas.create-node', {
-  id: `${parentId}-${name}`, name: `${parentId}-${name}`, parentId, type, x, y, w, h, ...props,
-});
-const text = (p, name, copy, x, y, w, size = 24, fill = ink, weight = 400, extra = {}) =>
-  node(p, name, 'text', x, y, w, undefined, { text: copy, size, family: 'Inter', fontWeight: weight,
-    lineHeight: 1.12, fill, ...extra });
-const rect = (p, name, x, y, w, h, fill, extra = {}) => node(p, name, 'rect', x, y, w, h, { fill, ...extra });
-const circle = (p, name, x, y, d, fill, extra = {}) => node(p, name, 'ellipse', x, y, d, d, { fill, ...extra });
-const rule = (p, y, color) => rect(p, `rule-${y}`, grid.margin, y, grid.w - grid.margin * 2, 1, color);
-const masthead = (p, index, color) => {
-  text(p, 'brand', 'FIELDWORK', grid.margin, 52, 400, 20, color, 700, { letterSpacing: 2 });
-  text(p, 'series', 'DESIGN NOTES     /     VOL. 01', 912, 54, 440, 14, color, 400, { letterSpacing: 1 });
-  text(p, 'folio', 'STUDIO PRACTICE', grid.margin, 828, 900, 14, color, 400, { letterSpacing: 1 });
-  text(p, 'page', String(index).padStart(2, '0'), 1304, 828, 48, 14, color, 400, { align: 'right' });
-};
-
-// Brief: show how one simple visual idea becomes a coherent editorial system.
-// Hierarchy: statement → geometric proof → compact practical explanation.
-// Motif: two fields meet to make a third; repeated with a different function on each slide.
-const cover = 'fieldwork-01';
-frame(cover, 0, paper); masthead(cover, 1, ink); rule(cover, 104, ink);
-text(cover, 'eyebrow', 'A NOTE ON MAKING', 88, 168, 560, 16, orange, 700, { letterSpacing: 2 });
-text(cover, 'title', 'Make room\nfor the idea.', 80, 228, 810, 108, ink, 700, { letterSpacing: -4, lineHeight: 1.02 });
-text(cover, 'intro', 'Good design begins with a point of view.\nThe system gives it room to grow.', 88, 538, 740, 25, muted);
-circle(cover, 'disc', 977, 233, 350, orange);
-rect(cover, 'field', 916, 385, 270, 270, ink);
-rect(cover, 'intersection', 977, 385, 209, 198, paper, { radius: 0 });
-text(cover, 'motif-caption', '01 / TWO FIELDS, ONE IDEA', 920, 696, 420, 14, muted, 400, { letterSpacing: 1 });
-rule(cover, 782, ink);
-
-const method = 'fieldwork-02';
-frame(method, 1, ink); masthead(method, 2, paper); rule(method, 104, '#607369');
-text(method, 'title', 'One idea.\nMany expressions.', 80, 164, 1120, 92, paper, 700, { letterSpacing: -3, lineHeight: 1.04 });
-text(method, 'intro', 'Keep the visual logic.\nChange what the content needs.', 952, 380, 400, 24, '#C7CFC4');
-const concepts = [
-  { x: 88, title: '01 / EMPHASIS', body: 'Let one thing lead.', kind: 0 },
-  { x: 520, title: '02 / RELATIONSHIP', body: 'Make the connection visible.', kind: 1 },
-  { x: 952, title: '03 / RHYTHM', body: 'Repeat with a reason.', kind: 2 },
-];
-for (const c of concepts) {
-  const y = 518;
-  if (c.kind === 0) { circle(method, 'emphasis', c.x, y, 152, orange); circle(method, 'quiet', c.x + 192, y + 92, 60, paper); }
-  if (c.kind === 1) { rect(method, 'relation-field', c.x, y + 20, 148, 120, paper); circle(method, 'relation-disc', c.x + 80, y, 152, orange); }
-  if (c.kind === 2) for (let i = 0; i < 4; i++) rect(method, `rhythm-${i}`, c.x + i * 78, y + i * 20, 48, 152 - i * 20, i === 3 ? orange : paper);
-  text(method, `label-${c.kind}`, c.title, c.x, 714, 380, 16, paper, 700, { letterSpacing: 1 });
-  text(method, `body-${c.kind}`, c.body, c.x, 748, 380, 20, '#C7CFC4');
+const fillWidth = id => op('canvas.update-nodes', { ids: [id], patch: { layoutSizingH: 'fill' } });
+// Page, section, row, card and button share this container contract.
+function flow(id, parentId, box, layout, children) {
+  // Enable flow before adding children so reading order is creation order.
+  op('frame.create', { id, name: id, parentId, fill: 'transparent', ...box,
+    autoLayout: { direction: 'v', gap: 24, padding: 0, ...layout },
+    layoutSizingH: layout.sizingH ?? 'fixed', layoutSizingV: layout.sizingV ?? 'hug' });
+  children(id);
+  op('canvas.auto-layout', { id, direction: 'v', gap: 24, padding: 0,
+    sizingH: 'fixed', sizingV: 'hug', ...layout });
+  return id;
 }
-
-const detail = 'fieldwork-03';
-frame(detail, 2, orange); masthead(detail, 3, paper); rule(detail, 104, paper);
-text(detail, 'title', 'The work is\nin the details.', 80, 168, 1100, 106, paper, 700, { letterSpacing: -4, lineHeight: 1.03 });
-text(detail, 'intro', 'A composition is finished when the details\nserve the idea — at every scale.', 88, 436, 850, 28, paper);
-rule(detail, 566, paper);
-const details = [
-  ['TYPE', 'Measure the words.\nGive them a voice.'],
-  ['SPACE', 'Group what belongs.\nLet the rest breathe.'],
-  ['REVIEW', 'Look at the result.\nMake the next decision.'],
-];
-details.forEach(([label, body], i) => {
-  const x = grid.margin + i * 432;
-  text(detail, `label-${i}`, label, x, 610, 380, 16, paper, 700, { letterSpacing: 2 });
-  text(detail, `body-${i}`, body, x, 662, 390, 28, paper);
-});
+function text(parentId, name, copy, w, size, fill, extra = {}) {
+  const id = parentId + '/' + name;
+  op('canvas.create-node', { id, name, parentId, type: 'text', w, text: copy,
+    size, family: 'Inter', fill, lineHeight: 'auto', ...extra });
+  fillWidth(id);
+  return id;
+}
+function page(id, x, mobile = false, dark = false) {
+  const w = mobile ? 390 : 1440, pad = mobile ? 24 : 80, inner = w - pad * 2;
+  const ink = dark ? '#F2F0E7' : '#172824', ground = dark ? '#172824' : '#F2F0E7';
+  flow(id, undefined, { x, y: 0, w, h: 1000, fill: ground }, { gap: 64, padding: pad }, p => {
+    flow(p + '/navigation', p, { w: inner, h: 48 }, { direction: 'h', align: 'center', justify: 'space-between' }, nav => {
+      text(nav, 'brand', 'FIELDWORK', inner - 140, 20, ink, { fontWeight: 700 });
+      text(nav, 'edition', 'STUDIO NOTES', 140, 14, ink);
+      op('canvas.update-nodes', { ids: [nav + '/edition'], patch: { layoutSizingH: 'fixed' } });
+    });
+    fillWidth(p + '/navigation');
+    flow(p + '/hero', p, { w: inner, h: 420 }, { direction: mobile ? 'v' : 'h', gap: 48 }, hero => {
+      const copyWidth = mobile ? inner : 740;
+      flow(hero + '/copy', hero, { w: copyWidth, h: 400 }, { gap: 24 }, copy => {
+        text(copy, 'eyebrow', 'A NOTE ON MAKING', copyWidth, 14, ink, { letterSpacing: 1.5 });
+        text(copy, 'title', 'Make room for the idea.', copyWidth, mobile ? 48 : 88, ink,
+          { fontWeight: 700, letterSpacing: -2, lineHeight: '105%' });
+        text(copy, 'description', 'A shared direction. An editable system. Room for the next idea.', copyWidth, 22, ink, { lineHeight: '145%' });
+        flow(copy + '/action', copy, { w: 240, h: 56, fill: ink, radius: 8 },
+          { direction: 'h', padding: 16, align: 'center' }, button => {
+            text(button, 'label', 'Explore the studio', 208, 16, ground, { align: 'center' });
+          });
+      });
+      fillWidth(hero + '/copy');
+      // Art-directed coordinates belong inside an owning artwork frame.
+      const art = hero + '/artwork', aw = mobile ? inner : 400;
+      op('frame.create', { id: art, name: 'Artwork / two fields', parentId: hero, w: aw, h: 320, fill: '#C84A2E' });
+      op('canvas.create-node', { id: art + '/disc', name: 'Disc', type: 'ellipse', parentId: art, x: 24, y: 24, w: 220, h: 220, fill: '#F2F0E7' });
+      op('canvas.create-node', { id: art + '/field', name: 'Field', type: 'rect', parentId: art, x: 116, y: 136, w: 196, h: 160, fill: '#172824' });
+    });
+    fillWidth(p + '/hero');
+    flow(p + '/features', p, { w: inner, h: 220 }, { direction: 'grid', columns: mobile ? 1 : 3,
+      rows: mobile ? 3 : 1, rowSizes: mobile ? ['hug', 'hug', 'hug'] : ['hug'], gap: 24, rowGap: 24 }, grid => {
+      for (const [name, title, body] of [
+        ['type', 'Give ideas a voice.', 'Type scales and wraps with the available space.'],
+        ['space', 'Keep room to grow.', 'Content owns its height. Related layers move together.'],
+        ['review', 'Make the next edit.', 'Resize a card and extend its copy to check the system.'],
+      ]) {
+        const card = grid + '/' + name, cw = mobile ? inner : (inner - 48) / 3;
+        flow(card, grid, { w: cw, h: 180, fill: dark ? '#294337' : '#FFFFFF', radius: 12 }, { gap: 16, padding: 24 }, c => {
+          text(c, 'title', title, cw - 48, 24, ink, { fontWeight: 600 });
+          text(c, 'body', body, cw - 48, 18, ink, { lineHeight: '145%' });
+        });
+        fillWidth(card);
+      }
+    });
+    fillWidth(p + '/features');
+    text(p, 'footer', 'FIELDWORK / A SYSTEM READY FOR CHANGE', inner, 14, ink, { letterSpacing: 1 });
+  });
+}
+page('01-desktop', 0);
+page('02-mobile', 1520, true);
+page('03-dark', 1990, false, true);
 writeFileSync(output, JSON.stringify({ compositionId, batch }, null, 2) + '\n');
-process.stdout.write(`${output}: ${batch.length} operations\n`);
+process.stdout.write(output + ': ' + batch.length + ' operations\n');

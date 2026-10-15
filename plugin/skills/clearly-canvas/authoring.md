@@ -10,8 +10,8 @@ Use a local builder and pass JSON through `@file` or stdin. Do not interpolate c
 SVG or code into shell strings. Here is a minimal native-node pattern; replace its
 visual decisions with the brief's system:
 
-For a complete editable three-artboard example, inspect [example.mjs](example.mjs).
-It demonstrates tokens, reusable helpers and varied compositions; it writes a payload
+For desktop, mobile and dark examples, inspect [example.mjs](example.mjs).
+It demonstrates nested flow containers, Hug/Fill sizing and framed artwork; it writes a payload
 without making remote calls. Run `node <skill-directory>/example.mjs <composition-id>`.
 Use its construction approach, not its fictional brand or aesthetic, for other briefs.
 
@@ -21,18 +21,22 @@ const compositionId = process.argv[2];
 const grid = { w: 1440, h: 900, margin: 88, gap: 24 };
 const color = { paper: '#F3F0E8', ink: '#172824', accent: '#CB482F' };
 const type = {
-  display: { family: 'Inter', size: 88, fontWeight: 700, lineHeight: 1.05, letterSpacing: -2 },
-  body: { family: 'Inter', size: 24, fontWeight: 400, lineHeight: 1.4 },
+  display: { family: 'Inter', size: 88, fontWeight: 700, lineHeight: '105%', letterSpacing: -2 },
+  body: { family: 'Inter', size: 24, fontWeight: 400, lineHeight: '140%' },
 };
 const batch = [];
 const add = (action, args) => batch.push({ action, args });
 add('frame.create', { name: '01-opening', x: 0, y: 0, w: grid.w, h: grid.h, fill: color.paper });
-const text = (name, copy, x, y, w, role) => add('canvas.create-node', {
-  name, type: 'text', parentId: '01-opening', x, y, w,
+add('frame.create', { name: 'hero-copy', parentId: '01-opening', w: 740, h: 400, fill: 'transparent' });
+const text = (name, copy, role) => add('canvas.create-node', {
+  name, type: 'text', parentId: 'hero-copy', w: 740,
   text: copy, fill: color.ink, ...type[role],
 });
-text('opening-title', 'Ideas take\nshape here.', grid.margin, 120, 740, 'display');
-text('opening-deck', 'An editable visual system for the next chapter.', grid.margin, 360, 580, 'body');
+text('opening-title', 'Ideas take shape here.', 'display');
+text('opening-deck', 'An editable visual system for the next chapter.', 'body');
+add('canvas.update-nodes', { ids: ['opening-title', 'opening-deck'], patch: { layoutSizingH: 'fill' } });
+add('canvas.auto-layout', { id: 'hero-copy', direction: 'v', gap: 24, sizingH: 'fixed', sizingV: 'hug' });
+add('canvas.auto-layout', { id: '01-opening', direction: 'v', gap: 64, padding: grid.margin, sizingH: 'fixed', sizingV: 'hug' });
 // Continue with the brief's central visual, supporting evidence and footer.
 writeFileSync('/tmp/canvas-build.json', JSON.stringify({ compositionId, batch }));
 ```
@@ -56,6 +60,13 @@ be unchanged and should reuse its previous evidence instead of recreating nodes.
 Keep executed payloads and returned-ID manifests separate from regenerated plans.
 
 ## Node shape and coordinates
+
+Choose ownership before coordinates: page → section → row/stack/grid → content. Put
+the container's background, border and radius on its frame. Auto layout owns positions
+in content flow; use Hug for content height and Fill for flexible width. Keep deliberate
+overlays and illustrations inside artwork frames. A native editable layer alone does
+not establish a usable document structure. Frames also make scoped perception cheaper:
+read the outline and the section you are editing instead of a full scene dump.
 
 Fields are flat: `{name,type,x,y,w,h,text,size,family,fontWeight,fill,...}`.
 Use `text` for copy, `size` for type size, numeric `fontWeight`, and `w`/`h` for bounds.
@@ -90,6 +101,14 @@ not a missing node. Replacing `svg` clears and rebuilds its reference automatica
 
 ## Typography
 
+Line height defaults to **Auto**, from the font itself. Use `lineHeight:"140%"` for a
+percentage of font size or `lineHeight:"24px"` for fixed leading. Numeric values in old
+scenes remain multipliers (`1.4` = `140%`); new designs should carry explicit units.
+Changing font size scales % leading and leaves px leading fixed. Paragraph spacing is
+`paragraphSpacing` in px after a hard newline, never a soft wrap. In a fixed-height
+box, `vAlign:"middle"` centers the line boxes; `"bottom"` anchors their bottom. Do not
+compensate with spaces, empty lines or hand-tuned y offsets.
+
 For prose, set `w` and omit `h` to enable auto-height. Omit both axes only for short
 single-line labels whose width should hug content. A fixed box sets that axis explicitly;
 it does not guarantee text will clip safely. Headless auto-height is an estimate from
@@ -99,7 +118,7 @@ then inspect the rendered result in the editor.
 ```json
 {"compositionId":"<id>","action":"canvas.measure-text","args":{
   "text":"Ideas take shape here.","family":"Inter","size":88,"fontWeight":700,
-  "letterSpacing":-2,"lineHeight":1.05,"maxWidth":740}}
+  "letterSpacing":-2,"lineHeight":"105%","maxWidth":740}}
 ```
 
 Use measured `height`/`lineCount` to place the next block. Measure the exact copy, font,
@@ -121,12 +140,20 @@ deliverable requires them, with content order and hierarchy reconsidered for the
 
 ## Technique
 
+- CONTAINERS: page sections, cards, sidebars and toolbars are named frames that own their content and background fill. Use live auto-layout for content rows, stacks and grids, with explicit Hug/Fill/Fixed sizing; position overlays and artwork deliberately within their owning frames. A rectangle behind sibling text is not a container. Verify the frame tree, resize a representative container and lengthen its copy on a duplicate before completion; record reflow checks separately from pixel review.
+- FIGMA WORKFLOW: approach this canvas as a designer working in Figma. Read the brand and component library; compose artboards from named editable frames, text, shapes and component instances; use auto-layout, constraints, styles and variables; create deliberate desktop/mobile and light/dark states; inspect at delivery size, iterate, then review the final edit. Discover the current canvas-catalog before assuming a familiar Figma operation is unavailable. Its headlessActions identify what runs without an open editor; live-only actions need an editor. Report an unsupported capability accurately rather than inventing an operation or claiming universal feature parity.
+
+- TYPOGRAPHY: lineHeight defaults to "auto", using the resolved font metrics. Author percentages as "140%" and absolute leading as "24px"; legacy numeric 1.4 still means 140%. Percentage leading follows font size; px leading stays fixed until the Scale tool scales the artwork. paragraphSpacing is px between hard-newline paragraphs, never soft wraps. For Auto width omit w/h; for Auto height set w and omit h; for a fixed box set w/h. Explicit layoutSizingH/V "fixed" or "fill" overrides legacy autoWidth/autoHeight. align is left|center|right|justify; vAlign is top|middle|bottom and applies to fixed-height boxes. Measure exact copy/font/weight/width using canvas.measure-text, then inspect the pixels; do not center text with spaces or arbitrary y offsets.
+
 The same rules the in-app assistant works to (canvas-catalog returns them as `technique`).
 
-- AUTO-LAYOUT: rows and stacks (nav links, button groups, card rows, form fields) are a frame whose children you create in reading order, then canvas.auto-layout { id, direction, gap, padding, align, justify, hug }. hug:false keeps the frame size, which a full-width bar needs with justify:"space-between"; set a child to layoutSizingH/V "fill" | "hug" | "fixed" with canvas.update-nodes. The frame stays live: create more children into it (parentId) and they flow in; layoutPositioning:"absolute" takes one out of the flow.
+- AUTO-LAYOUT: rows, stacks and grids are a frame whose children you create in reading order, then canvas.auto-layout { id, direction: "h" | "v" | "grid", gap, padding, align, justify, hug }. hug:false keeps the frame size; justify "space-between" | "space-around" | "space-evenly" are the Auto gaps; align:"baseline" lines up text in a row. Grids take columns, rows, columnGap, rowGap, columnSizes / rowSizes ("fill", "2fr", "hug", px). wrap:true flows into new rows; give Fill cards a minW so they wrap where you mean. Child settings go on the child via canvas.update-nodes: layoutSizingH/V "fill" | "hug" | "fixed", minW / maxW / minH / maxH, gridColumn / gridRow / gridColumnSpan, layoutPositioning:"absolute". The frame stays live: children created into it (parentId) flow in. Spacing variables: canvas.variable { op: "bind", ids, field, name }.
 - GRADIENTS: gradient { kind, angle, stops: [{ offset, color }] } replaces the solid fill. angle is the direction the colour travels: 0 = left to right, 90 = top to bottom, 45 = top-left to bottom-right (not CSS degrees). Use two or three stops from the brand palette, and keep text off a busy gradient or check its contrast in canvas.review.
 - SHADOWS AND BLUR: effects on any node. A soft card shadow is { type: "drop-shadow", x: 0, y: 4, blur: 16, spread: 0, color: "#0000001F" }; frosted glass is { type: "background-blur", blur: 16 }. Never fake a shadow with an extra rectangle.
-- DRAWING: build every mark, icon, illustration and diagram shape from native layers, as a designer does in Figma, never as one generated SVG file. Primitives are canvas.create-node rect and ellipse; curves are pen paths, vector.create { name, parentId, points: [{ x, y, hIn?: { x, y }, hOut?: { x, y } }], closed, fill or stroke, strokeWidth }, where hIn/hOut are absolute control points: use few anchors with smooth handles, and refine with vector.read, vector.vertex.move and vector.handle.set. Round caps and joins: canvas.update-nodes patch { strokeCap: "round", strokeJoin: "round" }. Work back to front: ground, big silhouettes in flat brand colours, then features, then details and highlights; check the silhouette in canvas.review before detailing. Name layers by part ("fox/ear-left"), group each figure with canvas.group { ids, name } and set overlap with canvas.order { ids, op }. Make a cut-out by layering a ground-colour shape on top; vector.boolean { op } on selected paths needs an open editor. Keep one stroke weight per drawing. Photographic or painterly imagery is a placed raster. Raw SVG stays supported but is never the default: when an SVG is asked for, write the markup yourself as an svg node, canvas.create-node { type: "svg", name, w, h, svg } with <svg viewBox="0 0 W H"> matching w and h, or import existing markup the same way; never an SVG generation pipeline.
+- DRAWING: build every mark, icon, illustration and diagram shape from native layers, as a designer does in Figma, never as one generated SVG file. Primitives are canvas.create-node rect and ellipse; curves are pen paths, vector.create { name, parentId, points: [{ x, y, hIn?: { x, y }, hOut?: { x, y } }], closed, fill or stroke, strokeWidth }, where hIn/hOut are absolute control points: use few anchors with smooth handles. It also takes d (SVG path data, converted to native editable points) or shape: petal|circle|polygon|star|arc|spiral with cx, cy and sizes; strokeCap/strokeJoin apply. Reshape in place with canvas.update-nodes { ids, patch: { points | d | shape } }. Draw a repeated part once: canvas.repeat { id, count, around | cx, cy } turns one petal into a flower; canvas.rotate { ids, angle, cx, cy }; canvas.boolean { ids, op: "union" | "subtract" | "intersect" | "exclude" } (exact, editable operands). Work back to front: ground, big silhouettes in flat brand colours, then features, then details and highlights; check the silhouette in canvas.review before detailing. Name layers by part ("fox/ear-left"), group each figure with canvas.group { ids, name } and set overlap with canvas.order { ids, op }. Keep one stroke weight per drawing. Photographic or painterly imagery is a placed raster. Raw SVG stays supported but is never the default: when an SVG is asked for, write the markup yourself as an svg node, canvas.create-node { type: "svg", name, w, h, svg } with <svg viewBox="0 0 W H"> matching w and h, or import existing markup the same way; never an SVG generation pipeline.
+- COMPUTED GEOMETRY: shapes from math (radial petals, spirals, grids) are computed and drawn in ONE call: canvas-act { compositionId, script } runs JavaScript with geo.petal/circle/arc/star/polygon/spiral/smooth/rotate/radial/grid/bounds (degrees, 0 = 3 o'clock, clockwise) and a read-only scene list, then applies the { action, args } steps it returns. Never copy numbers from one tool result into another call.
+- SHEETS: several concepts or variants go on canvas.sheet { name, title, subtitle, cards or count, cols, cardW, cardH }: a live wrap grid of card frames that own their captions, so rows never overlap. Draw into a card with parentId = its id.
+- MEASURE: answer spacing, overlap and alignment questions with canvas.measure { frame } or { ids } and quote its numbers, never from memory or a preview.
 - PLACEHOLDERS: until real imagery exists, draw a native placeholder at the final size in a muted brand tone, never a flat accent block: a rect with the slot radius plus a simple motif (an ellipse sun, a vector.create mountain), grouped with canvas.group and named "<section> image placeholder", with any label in its own text node.
 - SECTIONS: one frame per page section, named exactly as its ticket says, inside the page artboard. Build a section in one canvas-act batch that ends with canvas.review of the artboard and carries ticket: { id: "<its key>", status: "done", resolution: "<what changed>" }. The ticket moves only when that review is clean or look; result.ticket says whether it did. Then start the next section.
 

@@ -114,8 +114,9 @@ divided by the ratio. Sizes that share a ratio look related; sizes picked by han
   make them obviously different in class (a grotesque with a serif), never two neighbours.
 - **Measure: 45–75 characters.** At 16px in a normal grotesque that is roughly **360–600px**.
   Set the text node's `w` to hold that, not to fill the column.
-- **Line height moves INVERSELY to size.** Body 1.4–1.6. Subheads 1.25–1.35. Display
-  **0.95–1.05** — big type needs tight leading or it falls apart into stripes.
+- **Line height defaults to Auto**, using the font's metrics. When tuning it deliberately,
+  use **140–160%** for body, **125–135%** for subheads, and **95–105%** for display type.
+  Author explicit units (`lineHeight:"140%"` or `"24px"`); percentage leading follows font size.
 - ⚠⚠ **TRACK DISPLAY TYPE NEGATIVE.** Type designed at 16px is far too loose at 120px.
   Above ~40px use `letterSpacing: -1` to `-4`; above ~120px, −3 to −6. **Uppercase and small
   labels go the other way: +1 to +3.** This one adjustment does more for perceived quality
@@ -250,8 +251,8 @@ only to show that a review happened.
 
 **A 1080×1350 social post**
 ```
-margin 72 · display 96–140 (weight 800, tracking −3, lineHeight 1.0)
-body 20–24 (weight 500, lineHeight 1.5, w ≤ 560)
+margin 72 · display 96–140 (weight 800, tracking −3, lineHeight "100%")
+body 20–24 (weight 500, lineHeight "150%", w ≤ 560)
 caption 16 (weight 600, tracking +1.5, uppercase)
 rule 2–3px accent · footer block bottom-aligned at 1350 − 72 − blockHeight
 ```
@@ -265,7 +266,7 @@ Content column ≤ 1200 wide even though the slide is 1920 — full width is unr
 
 **A 1440 web hero**
 ```
-margin 96 · content max 1200 · headline 64–88 (tracking −2, lineHeight 1.05)
+margin 96 · content max 1200 · headline 64–88 (tracking −2, lineHeight "105%")
 sub 20–24 (muted ink, w ≤ 640) · CTA 48–56 tall, 24–32 horizontal padding, radius 8 or full
 ```
 
@@ -273,7 +274,9 @@ sub 20–24 (muted ink, w ≤ 640) · CTA 48–56 tall, 24–32 horizontal paddi
 ```
 padding 24–32 · radius 10–16 · gap between cards ≥ 2× padding
 title 20–24/600 · body 15–16/400 muted · one accent element maximum
-Background first, THEN the label — later nodes draw over earlier ones.
+Use a filled frame that owns the card's contents. Apply auto layout with this padding
+and a deliberate content gap; let text hug its height. Rectangles serve artwork,
+swatches and rules. A background rectangle with sibling text does not form a card.
 ```
 
 ---
